@@ -15,6 +15,10 @@ const buttonVariants = cva(
         secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        // Anime-inspired variants
+        glass: "glass-button text-foreground hover:bg-white/10 border border-white/20",
+        mood: "bg-gradient-primary text-primary-foreground shadow-primary hover:shadow-lg hover:scale-105 transition-all duration-300",
+        hero: "bg-gradient-primary text-primary-foreground shadow-elegant hover:shadow-primary hover:scale-105 transition-all duration-500",
       },
       size: {
         default: "h-10 px-4 py-2",
