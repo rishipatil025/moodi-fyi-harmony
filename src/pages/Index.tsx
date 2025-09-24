@@ -21,14 +21,12 @@ const Index = () => {
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
   const [showPlaylist, setShowPlaylist] = useState(false);
 
-  const handleMoodSelect = (mood: Mood) => {
+  const handleMoodSelect = async (mood: Mood) => {
     setSelectedMood(mood);
-    const playlist = mockPlaylists[mood.id];
-    if (playlist && playlist.tracks.length > 0) {
-      musicPlayer.playPlaylist(playlist.tracks);
-      // Auto show playlist after a brief moment
-      setTimeout(() => setShowPlaylist(true), 1500);
-    }
+    // Load real music from JioSaavn based on mood
+    await musicPlayer.loadMoodPlaylist(mood.id);
+    // Auto show playlist after a brief moment
+    setTimeout(() => setShowPlaylist(true), 2000);
   };
 
   const currentPlaylist = selectedMood ? mockPlaylists[selectedMood.id] : null;

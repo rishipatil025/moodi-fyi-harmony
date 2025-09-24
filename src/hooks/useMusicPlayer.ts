@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Track } from '@/data/mockMusic';
+import { getSongsByMood } from '@/services/jiosaavn';
 
 interface MusicPlayerState {
   currentTrack: Track | null;
@@ -20,52 +21,118 @@ export const useMusicPlayer = () => {
     currentTrackIndex: -1,
   });
 
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Simulate audio playback with timer
+  // Initialize audio element
   useEffect(() => {
-    if (state.isPlaying && state.currentTrack) {
-      intervalRef.current = setInterval(() => {
-        setState(prev => {
-          const newTime = prev.currentTime + 1;
-          
-          // Auto advance to next track when current track ends
-          if (newTime >= prev.currentTrack!.duration) {
-            if (prev.currentTrackIndex < prev.queue.length - 1) {
-              return {
-                ...prev,
-                currentTrackIndex: prev.currentTrackIndex + 1,
-                currentTrack: prev.queue[prev.currentTrackIndex + 1],
-                currentTime: 0,
-              };
-            } else {
-              // End of playlist
-              return {
-                ...prev,
-                isPlaying: false,
-                currentTime: 0,
-              };
-            }
-          }
-          
+    audioRef.current = new Audio();
+    
+    const audio = audioRef.current;
+    
+    // Set up audio event listeners
+    const handleTimeUpdate = () => {
+      setState(prev => ({
+        ...prev,
+        currentTime: audio.currentTime,
+      }));
+    };
+
+    const handleEnded = () => {
+      setState(prev => {
+        const nextIndex = prev.currentTrackIndex + 1;
+        if (nextIndex < prev.queue.length) {
           return {
             ...prev,
-            currentTime: newTime,
+            currentTrackIndex: nextIndex,
+            currentTrack: prev.queue[nextIndex],
+            currentTime: 0,
+            isPlaying: true,
           };
-        });
-      }, 1000);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    }
+        } else {
+          return {
+            ...prev,
+            isPlaying: false,
+            currentTime: 0,
+          };
+        }
+      });
+    };
+
+    const handleLoadedData = () => {
+      setState(prev => ({
+        ...prev,
+        duration: audio.duration || 0,
+      }));
+    };
+
+    const handleError = (e: Event) => {
+      console.error('Audio playback error:', e);
+      setState(prev => ({
+        ...prev,
+        isPlaying: false,
+      }));
+    };
+
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('loadeddata', handleLoadedData);
+    audio.addEventListener('error', handleError);
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('loadeddata', handleLoadedData);
+      audio.removeEventListener('error', handleError);
+      audio.pause();
+      audio.src = '';
     };
-  }, [state.isPlaying, state.currentTrack]);
+  }, []);
+
+  // Handle track changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio || !state.currentTrack?.url) return;
+
+    audio.src = state.currentTrack.url;
+    audio.currentTime = state.currentTime;
+    
+    if (state.isPlaying) {
+      audio.play().catch(console.error);
+    } else {
+      audio.pause();
+    }
+  }, [state.currentTrack?.url]);
+
+  // Handle play/pause state changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (state.isPlaying) {
+      audio.play().catch(console.error);
+    } else {
+      audio.pause();
+    }
+  }, [state.isPlaying]);
+
+  // Handle volume changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    
+    audio.volume = state.volume / 100;
+  }, [state.volume]);
+
+  // Handle seek changes
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    
+    // Only update if there's a significant difference to avoid feedback loops
+    if (Math.abs(audio.currentTime - state.currentTime) > 1) {
+      audio.currentTime = state.currentTime;
+    }
+  }, [state.currentTime]);
 
   const playTrack = useCallback((track: Track, queue: Track[] = [track]) => {
     const trackIndex = queue.findIndex(t => t.id === track.id);
@@ -77,6 +144,24 @@ export const useMusicPlayer = () => {
       isPlaying: true,
       currentTime: 0,
     }));
+  }, []);
+
+  const loadMoodPlaylist = useCallback(async (mood: string) => {
+    try {
+      const tracks = await getSongsByMood(mood, 15);
+      if (tracks.length > 0) {
+        setState(prev => ({
+          ...prev,
+          currentTrack: tracks[0],
+          queue: tracks,
+          currentTrackIndex: 0,
+          isPlaying: true,
+          currentTime: 0,
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to load mood playlist:', error);
+    }
   }, []);
 
   const playPlaylist = useCallback((tracks: Track[], startIndex: number = 0) => {
@@ -158,6 +243,7 @@ export const useMusicPlayer = () => {
     ...state,
     playTrack,
     playPlaylist,
+    loadMoodPlaylist,
     togglePlayPause,
     playNext,
     playPrevious,
