@@ -1,12 +1,13 @@
 import { useState } from "react";
-import FloatingParticles from "@/components/FloatingParticles";
 import MoodTiles from "@/components/MoodTiles";
-import MusicPlayer from "@/components/MusicPlayer";
 import PlaylistView from "@/components/PlaylistView";
+import MusicPlayer from "@/components/MusicPlayer";
+import FloatingParticles from "@/components/FloatingParticles";
+import { SearchBar } from "@/components/SearchBar";
+import { PlaylistManager } from "@/components/PlaylistManager";
 import { useMusicPlayer } from "@/hooks/useMusicPlayer";
-import { mockPlaylists } from "@/data/mockMusic";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft } from "lucide-react";
+import { Search, Music, Home } from "lucide-react";
 
 interface Mood {
   id: string;
@@ -17,114 +18,167 @@ interface Mood {
 }
 
 const Index = () => {
-  const musicPlayer = useMusicPlayer();
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
   const [showPlaylist, setShowPlaylist] = useState(false);
+  const [currentView, setCurrentView] = useState<'moods' | 'search' | 'playlists'>('moods');
+  
+  const {
+    currentTrack,
+    isPlaying,
+    currentTime,
+    duration,
+    volume,
+    queue,
+    currentTrackIndex,
+    playlists,
+    playTrack,
+    playPlaylist,
+    loadMoodPlaylist,
+    togglePlayPause,
+    playNext,
+    playPrevious,
+    seekTo,
+    setVolume,
+    createPlaylist,
+    deletePlaylist,
+    renamePlaylist,
+    addToPlaylist,
+    removeFromPlaylist,
+    playFromPlaylist,
+  } = useMusicPlayer();
 
   const handleMoodSelect = async (mood: Mood) => {
     setSelectedMood(mood);
-    // Load real music from JioSaavn based on mood
-    await musicPlayer.loadMoodPlaylist(mood.id);
-    // Auto show playlist after a brief moment
-    setTimeout(() => setShowPlaylist(true), 2000);
+    await loadMoodPlaylist(mood.id);
+    setShowPlaylist(true);
   };
 
-  const currentPlaylist = selectedMood ? mockPlaylists[selectedMood.id] : null;
+  const handleTrackSelect = (track: any) => {
+    playTrack(track, [track]);
+  };
+
+  const handleAddToPlaylist = (track: any) => {
+    if (playlists.length === 0) {
+      createPlaylist('My Playlist');
+      setTimeout(() => {
+        addToPlaylist(Date.now().toString(), track);
+      }, 100);
+    } else {
+      // Add to first playlist for now, could be improved with playlist selection
+      addToPlaylist(playlists[0].id, track);
+    }
+  };
+
+  const renderContent = () => {
+    if (currentView === 'search') {
+      return (
+        <SearchBar 
+          onTrackSelect={handleTrackSelect}
+          onAddToPlaylist={handleAddToPlaylist}
+        />
+      );
+    }
+    
+    if (currentView === 'playlists') {
+      return (
+        <PlaylistManager
+          playlists={playlists}
+          onCreatePlaylist={createPlaylist}
+          onDeletePlaylist={deletePlaylist}
+          onRenamePlaylist={renamePlaylist}
+          onRemoveFromPlaylist={removeFromPlaylist}
+          onPlayPlaylist={playFromPlaylist}
+          currentTrack={currentTrack}
+        />
+      );
+    }
+
+    if (showPlaylist && selectedMood) {
+      const moodPlaylist = {
+        id: selectedMood.id,
+        name: selectedMood.name,
+        description: selectedMood.description,
+        tracks: queue,
+        moodId: selectedMood.id
+      };
+      
+      return (
+        <PlaylistView 
+          playlist={moodPlaylist}
+          currentTrack={currentTrack}
+          isPlaying={isPlaying}
+          onTrackSelect={(track, tracks) => playTrack(track, tracks)}
+          onPlayPause={togglePlayPause}
+        />
+      );
+    }
+
+    return <MoodTiles onMoodSelect={handleMoodSelect} />;
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-bg relative overflow-hidden">
-      {/* Floating Particles Background */}
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
       <FloatingParticles />
       
-      {/* Main Content */}
-      <main className="relative z-10 min-h-screen flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-7xl mx-auto">
-          {!selectedMood ? (
-            <MoodTiles onMoodSelect={handleMoodSelect} />
-          ) : showPlaylist && currentPlaylist ? (
-            <div className="space-y-8">
-              {/* Back Button */}
-              <div className="flex items-center gap-4 fade-in-up">
-                <Button
-                  variant="glass"
-                  size="sm"
-                  onClick={() => setShowPlaylist(false)}
-                  className="rounded-full"
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                  Back to Mood
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedMood(null);
-                    setShowPlaylist(false);
-                  }}
-                  className="rounded-full opacity-70 hover:opacity-100"
-                >
-                  Choose Different Mood
-                </Button>
-              </div>
-              
-              <PlaylistView
-                playlist={currentPlaylist}
-                currentTrack={musicPlayer.currentTrack}
-                isPlaying={musicPlayer.isPlaying}
-                onTrackSelect={musicPlayer.playTrack}
-                onPlayPause={musicPlayer.togglePlayPause}
-              />
+      <div className="relative z-10 p-8">
+        <div className="max-w-6xl mx-auto">
+          <header className="text-center mb-8">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent">
+              MoodiFy KP
+            </h1>
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-6">
+              Experience music through your emotions. Choose your current mood and let us curate the perfect soundtrack for your soul.
+            </p>
+            
+            {/* Navigation */}
+            <div className="flex justify-center gap-4 mb-8">
+              <Button
+                variant={currentView === 'moods' ? 'default' : 'outline'}
+                onClick={() => {
+                  setCurrentView('moods');
+                  setShowPlaylist(false);
+                  setSelectedMood(null);
+                }}
+                className="flex items-center gap-2"
+              >
+                <Home className="h-4 w-4" />
+                Moods
+              </Button>
+              <Button
+                variant={currentView === 'search' ? 'default' : 'outline'}
+                onClick={() => setCurrentView('search')}
+                className="flex items-center gap-2"
+              >
+                <Search className="h-4 w-4" />
+                Search
+              </Button>
+              <Button
+                variant={currentView === 'playlists' ? 'default' : 'outline'}
+                onClick={() => setCurrentView('playlists')}
+                className="flex items-center gap-2"
+              >
+                <Music className="h-4 w-4" />
+                Playlists ({playlists.length})
+              </Button>
             </div>
-          ) : (
-            <div className="text-center space-y-8 fade-in-up">
-              <div className="glass-card p-8 rounded-3xl max-w-2xl mx-auto">
-                <div className="text-6xl mb-4 breathe">{selectedMood.emoji}</div>
-                <h1 className="text-4xl font-light font-japanese mb-2">
-                  {selectedMood.name}
-                </h1>
-                <p className="text-muted-foreground mb-6">
-                  {selectedMood.description}
-                </p>
-                <p className="text-sm text-muted-foreground/70 mb-8">
-                  Now playing your {selectedMood.name.toLowerCase()} playlist
-                </p>
-                
-                <div className="flex gap-4 justify-center">
-                  <Button
-                    variant="hero"
-                    onClick={() => setShowPlaylist(true)}
-                    className="rounded-full font-japanese"
-                  >
-                    View Playlist
-                  </Button>
-                  <Button
-                    variant="glass"
-                    onClick={() => setSelectedMood(null)}
-                    className="rounded-full font-japanese"
-                  >
-                    Choose Another Mood
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </main>
+          </header>
 
-      {/* Persistent Music Player */}
-      {musicPlayer.currentTrack && (
-        <MusicPlayer
-          currentTrack={musicPlayer.currentTrack}
-          isPlaying={musicPlayer.isPlaying}
-          onPlayPause={musicPlayer.togglePlayPause}
-          onNext={musicPlayer.playNext}
-          onPrevious={musicPlayer.playPrevious}
-          currentTime={musicPlayer.currentTime}
-          onSeek={musicPlayer.seekTo}
-          volume={musicPlayer.volume}
-          onVolumeChange={musicPlayer.setVolume}
-        />
-      )}
+          {renderContent()}
+        </div>
+      </div>
+
+      {/* Music Player */}
+      <MusicPlayer
+        currentTrack={currentTrack}
+        isPlaying={isPlaying}
+        currentTime={currentTime}
+        volume={volume}
+        onPlayPause={togglePlayPause}
+        onNext={playNext}
+        onPrevious={playPrevious}
+        onSeek={seekTo}
+        onVolumeChange={setVolume}
+      />
     </div>
   );
 };

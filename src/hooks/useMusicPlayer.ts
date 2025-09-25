@@ -2,6 +2,13 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Track } from '@/data/mockMusic';
 import { getSongsByMood } from '@/services/jiosaavn';
 
+export interface Playlist {
+  id: string;
+  name: string;
+  tracks: Track[];
+  createdAt: Date;
+}
+
 interface MusicPlayerState {
   currentTrack: Track | null;
   isPlaying: boolean;
@@ -10,6 +17,7 @@ interface MusicPlayerState {
   volume: number;
   queue: Track[];
   currentTrackIndex: number;
+  playlists: Playlist[];
 }
 
 export const useMusicPlayer = () => {
@@ -21,6 +29,7 @@ export const useMusicPlayer = () => {
     volume: 70,
     queue: [],
     currentTrackIndex: -1,
+    playlists: [],
   });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -245,6 +254,70 @@ export const useMusicPlayer = () => {
     }));
   }, []);
 
+  const createPlaylist = useCallback((name: string) => {
+    const newPlaylist: Playlist = {
+      id: Date.now().toString(),
+      name,
+      tracks: [],
+      createdAt: new Date(),
+    };
+    setState(prev => ({
+      ...prev,
+      playlists: [...prev.playlists, newPlaylist],
+    }));
+  }, []);
+
+  const deletePlaylist = useCallback((playlistId: string) => {
+    setState(prev => ({
+      ...prev,
+      playlists: prev.playlists.filter(p => p.id !== playlistId),
+    }));
+  }, []);
+
+  const renamePlaylist = useCallback((playlistId: string, newName: string) => {
+    setState(prev => ({
+      ...prev,
+      playlists: prev.playlists.map(p => 
+        p.id === playlistId ? { ...p, name: newName } : p
+      ),
+    }));
+  }, []);
+
+  const addToPlaylist = useCallback((playlistId: string, track: Track) => {
+    setState(prev => ({
+      ...prev,
+      playlists: prev.playlists.map(p => 
+        p.id === playlistId && !p.tracks.find(t => t.id === track.id)
+          ? { ...p, tracks: [...p.tracks, track] }
+          : p
+      ),
+    }));
+  }, []);
+
+  const removeFromPlaylist = useCallback((playlistId: string, trackId: string) => {
+    setState(prev => ({
+      ...prev,
+      playlists: prev.playlists.map(p => 
+        p.id === playlistId
+          ? { ...p, tracks: p.tracks.filter(t => t.id !== trackId) }
+          : p
+      ),
+    }));
+  }, []);
+
+  const playFromPlaylist = useCallback((playlist: Playlist, startIndex: number = 0) => {
+    if (playlist.tracks.length > 0 && startIndex < playlist.tracks.length) {
+      setState(prev => ({
+        ...prev,
+        currentTrack: playlist.tracks[startIndex],
+        queue: playlist.tracks,
+        currentTrackIndex: startIndex,
+        isPlaying: true,
+        currentTime: 0,
+      }));
+    }
+  }, []);
+
   return {
     ...state,
     playTrack,
@@ -255,5 +328,11 @@ export const useMusicPlayer = () => {
     playPrevious,
     seekTo,
     setVolume,
+    createPlaylist,
+    deletePlaylist,
+    renamePlaylist,
+    addToPlaylist,
+    removeFromPlaylist,
+    playFromPlaylist,
   };
 };
