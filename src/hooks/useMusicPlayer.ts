@@ -30,6 +30,10 @@ export const useMusicPlayer = () => {
     audioRef.current = new Audio();
     
     const audio = audioRef.current;
+    if (audio) {
+      audio.preload = 'auto';
+      audio.crossOrigin = 'anonymous';
+    }
     
     // Set up audio event listeners
     const handleTimeUpdate = () => {

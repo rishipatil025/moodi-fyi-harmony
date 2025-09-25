@@ -10,11 +10,11 @@ export interface JioSaavnTrack {
   };
   image: Array<{
     quality: string;
-    link: string;
+    url: string;
   }>;
   downloadUrl: Array<{
     quality: string;
-    link: string;
+    url: string;
   }>;
   duration: string;
 }
@@ -35,9 +35,9 @@ export const convertToTrack = (jiosaavnTrack: JioSaavnTrack) => ({
   title: jiosaavnTrack.name,
   artist: jiosaavnTrack.primaryArtists,
   album: jiosaavnTrack.album?.name || 'Unknown Album',
-  albumArt: jiosaavnTrack.image?.[2]?.link || jiosaavnTrack.image?.[1]?.link || jiosaavnTrack.image?.[0]?.link || '',
+  albumArt: jiosaavnTrack.image?.[2]?.url || jiosaavnTrack.image?.[1]?.url || jiosaavnTrack.image?.[0]?.url || '',
   duration: parseInt(jiosaavnTrack.duration) || 0,
-  url: jiosaavnTrack.downloadUrl?.[4]?.link || jiosaavnTrack.downloadUrl?.[3]?.link || jiosaavnTrack.downloadUrl?.[2]?.link || jiosaavnTrack.downloadUrl?.[1]?.link || jiosaavnTrack.downloadUrl?.[0]?.link,
+  url: jiosaavnTrack.downloadUrl?.[4]?.url || jiosaavnTrack.downloadUrl?.[3]?.url || jiosaavnTrack.downloadUrl?.[2]?.url || jiosaavnTrack.downloadUrl?.[1]?.url || jiosaavnTrack.downloadUrl?.[0]?.url,
 });
 
 // Search for songs
@@ -156,7 +156,7 @@ export const getSongsByMood = async (mood: string, limit: number = 15) => {
 // Get song details by ID
 export const getSongById = async (id: string) => {
   try {
-    const response = await fetch(`${JIOSAAVN_BASE_URL}/songs?id=${id}`);
+    const response = await fetch(`${JIOSAAVN_BASE_URL}/songs?ids=${id}`);
     if (!response.ok) throw new Error('Song fetch failed');
     
     const data: { data: JioSaavnTrack[] } = await response.json();
