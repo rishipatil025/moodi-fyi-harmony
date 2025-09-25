@@ -127,13 +127,25 @@ export const getSongsByMood = async (mood: string, limit: number = 15) => {
       index === self.findIndex(t => t.id === track.id)
     );
     
-    if (uniqueTracks.length > 0) {
-      return uniqueTracks.slice(0, limit);
-    } else {
-      // Fallback to sample tracks if API fails
-      console.log('Using fallback tracks for mood:', mood);
-      return getFallbackTracks(mood);
+    // Prefer tracks that already include streaming URLs
+    const withUrl = uniqueTracks.filter(t => !!t.url);
+    if (withUrl.length > 0) {
+      return withUrl.slice(0, limit);
     }
+
+    // Try to fetch details to resolve URLs
+    const detailed = await Promise.all(
+      uniqueTracks.slice(0, limit * 2).map(t => getSongById(t.id))
+    );
+    const detailedWithUrl = detailed.filter((t): t is any => !!t && !!t.url);
+
+    if (detailedWithUrl.length > 0) {
+      return detailedWithUrl.slice(0, limit);
+    }
+
+    // Fallback to sample tracks if still no URLs
+    console.log('Using fallback tracks for mood:', mood);
+    return getFallbackTracks(mood);
   } catch (error) {
     console.error('JioSaavn mood search error:', error);
     // Return fallback tracks when API fails
