@@ -1,5 +1,5 @@
-// JioSaavn API integration for real music streaming
-const JIOSAAVN_BASE_URL = 'https://jiosaavn-api-privateacc.vercel.app';
+// JioSaavn API integration with fallback sample tracks
+const JIOSAAVN_BASE_URL = 'https://saavn.dev/api';
 
 export interface JioSaavnTrack {
   id: string;
@@ -68,6 +68,41 @@ export const getTrendingSongs = async (limit: number = 20) => {
   }
 };
 
+// Fallback sample tracks for when API fails
+const getFallbackTracks = (mood: string): any[] => {
+  const fallbackTracks = [
+    {
+      id: `${mood}-1`,
+      title: `${mood} Vibes`,
+      artist: 'Mood Artist',
+      album: `${mood} Collection`,
+      albumArt: 'https://picsum.photos/300/300?random=1',
+      duration: 180,
+      url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+    },
+    {
+      id: `${mood}-2`, 
+      title: `${mood} Dreams`,
+      artist: 'Ambient Sounds',
+      album: `${mood} Experience`,
+      albumArt: 'https://picsum.photos/300/300?random=2',
+      duration: 240,
+      url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+    },
+    {
+      id: `${mood}-3`,
+      title: `${mood} Journey`,
+      artist: 'Melody Maker', 
+      album: `${mood} Stories`,
+      albumArt: 'https://picsum.photos/300/300?random=3',
+      duration: 195,
+      url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+    }
+  ];
+  
+  return fallbackTracks;
+};
+
 // Get songs by mood (using search with mood-related keywords)
 export const getSongsByMood = async (mood: string, limit: number = 15) => {
   const moodQueries: Record<string, string[]> = {
@@ -92,10 +127,17 @@ export const getSongsByMood = async (mood: string, limit: number = 15) => {
       index === self.findIndex(t => t.id === track.id)
     );
     
-    return uniqueTracks.slice(0, limit);
+    if (uniqueTracks.length > 0) {
+      return uniqueTracks.slice(0, limit);
+    } else {
+      // Fallback to sample tracks if API fails
+      console.log('Using fallback tracks for mood:', mood);
+      return getFallbackTracks(mood);
+    }
   } catch (error) {
     console.error('JioSaavn mood search error:', error);
-    return [];
+    // Return fallback tracks when API fails
+    return getFallbackTracks(mood);
   }
 };
 

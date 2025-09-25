@@ -6,6 +6,7 @@ interface MusicPlayerState {
   currentTrack: Track | null;
   isPlaying: boolean;
   currentTime: number;
+  duration: number;
   volume: number;
   queue: Track[];
   currentTrackIndex: number;
@@ -16,6 +17,7 @@ export const useMusicPlayer = () => {
     currentTrack: null,
     isPlaying: false,
     currentTime: 0,
+    duration: 0,
     volume: 70,
     queue: [],
     currentTrackIndex: -1,
