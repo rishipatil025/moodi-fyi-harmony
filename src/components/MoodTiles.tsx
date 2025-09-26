@@ -78,11 +78,11 @@ const MoodTiles = ({ onMoodSelect }: MoodTilesProps) => {
   return (
     <div className="w-full max-w-6xl mx-auto px-4">
       <div className="text-center mb-12 fade-in-up">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-light mb-4 font-noto bg-gradient-primary bg-clip-text text-transparent">
-          What's your vibe today?
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-light mb-4 font-japanese bg-gradient-primary bg-clip-text text-transparent">
+          What's your mood today, KP?
         </h1>
-        <p className="text-lg text-muted-foreground font-light font-crimson italic">
-          ~ Select a mood and let the music flow through your soul ~
+        <p className="text-lg text-muted-foreground font-light">
+          Select a vibe and let the music flow through your soul
         </p>
       </div>
 
@@ -125,10 +125,10 @@ const MoodTiles = ({ onMoodSelect }: MoodTilesProps) => {
 
               {/* Mood Info */}
               <div className="space-y-2">
-                <h3 className="text-2xl md:text-3xl font-medium text-white font-noto group-hover:text-white transition-colors">
+                <h3 className="text-2xl md:text-3xl font-medium text-white font-japanese group-hover:text-white transition-colors">
                   {mood.name}
                 </h3>
-                <p className="text-white/70 text-sm md:text-base font-light font-crimson italic group-hover:text-white/90 transition-colors">
+                <p className="text-white/70 text-sm md:text-base font-light group-hover:text-white/90 transition-colors">
                   {mood.description}
                 </p>
               </div>
@@ -157,12 +157,9 @@ const MoodTiles = ({ onMoodSelect }: MoodTilesProps) => {
       </div>
 
       <div className="text-center mt-12 fade-in-up" style={{ animationDelay: '0.6s' }}>
-        <p className="text-sm text-muted-foreground/60 font-light font-crimson italic">
-          ~ Each mood brings a unique sonic journey crafted just for you ~
+        <p className="text-sm text-muted-foreground/60 font-light">
+          Each mood brings a unique sonic journey crafted just for you
         </p>
-        <div className="mt-4 font-dancing text-gold/60 text-lg">
-          Curated with ♡ by KP
-        </div>
       </div>
     </div>
   );

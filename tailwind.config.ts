@@ -13,13 +13,7 @@ export default {
       },
     },
     extend: {
-      fontFamily: {
-        dancing: ['Dancing Script', 'cursive'],
-        noto: ['Noto Sans JP', 'sans-serif'],
-        crimson: ['Crimson Text', 'serif'],
-      },
       colors: {
-        gold: "hsl(45, 100%, 60%)",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
