@@ -64,24 +64,24 @@ const MusicPlayer = ({
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-glow/20 p-6 energy-aura">
-      <div className="max-w-7xl mx-auto flex items-center gap-6">
-        {/* Anime Track Info */}
-        <div className="flex items-center gap-4 min-w-0 flex-1 max-w-sm">
-          <div className="relative group power-glow">
+    <div className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-white/10 p-4">
+      <div className="max-w-7xl mx-auto flex items-center gap-4">
+        {/* Current Track Info */}
+        <div className="flex items-center gap-3 min-w-0 flex-1 max-w-xs">
+          <div className="relative group">
             <img
               src={currentTrack.albumArt}
               alt={currentTrack.album}
-              className="w-16 h-16 rounded-xl object-cover shadow-neon transition-all duration-500 group-hover:scale-110 breathe"
+              className="w-14 h-14 rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:scale-105"
             />
-            <div className="absolute inset-0 bg-gradient-hero opacity-0 group-hover:opacity-20 rounded-xl transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-black/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </div>
           
           <div className="min-w-0 flex-1">
-            <h4 className="font-medium text-foreground truncate font-japanese text-lg neon-text">
+            <h4 className="font-medium text-foreground truncate font-japanese">
               {currentTrack.title}
             </h4>
-            <p className="text-sm text-foreground-secondary truncate font-elegant">
+            <p className="text-sm text-muted-foreground truncate">
               {currentTrack.artist}
             </p>
           </div>
@@ -123,12 +123,12 @@ const MusicPlayer = ({
             
             <Button
               onClick={onPlayPause}
-              className="w-14 h-14 rounded-full bg-gradient-hero shadow-neon hover:shadow-intense transition-all duration-500 hover:scale-110 power-glow energy-aura"
+              className="w-12 h-12 rounded-full bg-gradient-primary shadow-primary hover:shadow-lg transition-all duration-300 hover:scale-105"
             >
               {isPlaying ? (
-                <Pause className="w-6 h-6 text-background" />
+                <Pause className="w-5 h-5 text-background" />
               ) : (
-                <Play className="w-6 h-6 text-background ml-1" />
+                <Play className="w-5 h-5 text-background ml-0.5" />
               )}
             </Button>
             
@@ -182,10 +182,10 @@ const MusicPlayer = ({
           </div>
         </div>
 
-        {/* Anime Audio Visualizer & Volume */}
-        <div className="flex items-center gap-6 min-w-0 flex-1 max-w-sm justify-end">
-          {/* Enhanced Audio Visualizer */}
-          <div className="hidden md:flex items-end gap-1 h-8 power-glow">
+        {/* Audio Visualizer & Volume */}
+        <div className="flex items-center gap-4 min-w-0 flex-1 max-w-xs justify-end">
+          {/* Audio Visualizer */}
+          <div className="hidden md:flex items-end gap-0.5 h-6">
             {visualizerBars}
           </div>
           

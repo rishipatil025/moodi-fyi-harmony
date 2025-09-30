@@ -78,96 +78,75 @@ const MoodTiles = ({ onMoodSelect }: MoodTilesProps) => {
   return (
     <div className="w-full max-w-6xl mx-auto px-4">
       <div className="text-center mb-12 fade-in-up">
-        <div className="flex items-center justify-center gap-3 mb-6">
-          <div className="kp-signature text-4xl float">KP</div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-light font-japanese neon-text">
-            今日の気分は？
-          </h1>
-        </div>
-        <p className="text-lg text-foreground-secondary font-elegant">
-          あなたの魂に響く音楽を見つけてください
-        </p>
-        <p className="text-sm text-muted-foreground mt-2 font-light">
-          Select your emotional wavelength and dive into sonic transcendence
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-light mb-4 font-japanese bg-gradient-primary bg-clip-text text-transparent">
+          What's your mood today, KP?
+        </h1>
+        <p className="text-lg text-muted-foreground font-light">
+          Select a vibe and let the music flow through your soul
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
         {moods.map((mood, index) => (
           <div
             key={mood.id}
-            className={`mood-tile power-glow sakura-effect relative h-56 md:h-64 lg:h-72 cursor-pointer transition-all duration-700 fade-in-up group ${
+            className={`mood-tile relative h-48 md:h-56 lg:h-64 rounded-2xl cursor-pointer transition-all duration-500 fade-in-up group ${
               hoveredMood === mood.id ? 'scale-105' : ''
             }`}
             style={{
-              backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.4)), url(${mood.bgImage})`,
+              backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url(${mood.bgImage})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-              animationDelay: `${index * 0.15}s`,
+              animationDelay: `${index * 0.1}s`,
             }}
             onClick={() => onMoodSelect(mood)}
             onMouseEnter={() => setHoveredMood(mood.id)}
             onMouseLeave={() => setHoveredMood(null)}
           >
-            {/* Anime Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent rounded-2xl" />
             
-            {/* Dynamic Glow Effect */}
+            {/* Glow Effect */}
             <div 
-              className={`absolute inset-0 opacity-0 group-hover:opacity-30 transition-all duration-700`}
+              className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-500`}
               style={{
-                background: `radial-gradient(circle at center, hsl(var(--${mood.color})) 0%, hsl(var(--${mood.color}), 0.3) 40%, transparent 70%)`,
+                background: `radial-gradient(circle at center, hsl(var(--${mood.color})) 0%, transparent 70%)`,
               }}
             />
-            
-            {/* Energy Border */}
-            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-60 transition-opacity duration-500"
-                 style={{
-                   border: `2px solid hsl(var(--${mood.color}))`,
-                   boxShadow: `0 0 20px hsl(var(--${mood.color}), 0.5)`,
-                 }}
-            />
 
-            {/* Anime Content */}
-            <div className="absolute inset-0 flex flex-col justify-between p-8 z-10">
-              {/* Floating Emoji */}
+            {/* Content */}
+            <div className="absolute inset-0 flex flex-col justify-between p-6 z-10">
+              {/* Emoji */}
               <div className="self-end">
-                <span className="text-5xl md:text-6xl opacity-90 group-hover:opacity-100 transition-all duration-500 group-hover:scale-125 float breathe">
+                <span className="text-4xl md:text-5xl opacity-80 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
                   {mood.emoji}
                 </span>
               </div>
 
-              {/* Mood Info with Japanese */}
-              <div className="space-y-3">
-                <h3 className="text-3xl md:text-4xl font-medium text-white font-japanese group-hover:text-white transition-all duration-300"
-                    style={{ 
-                      textShadow: `0 0 10px hsl(var(--${mood.color}), 0.8)`,
-                      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.5))'
-                    }}>
+              {/* Mood Info */}
+              <div className="space-y-2">
+                <h3 className="text-2xl md:text-3xl font-medium text-white font-japanese group-hover:text-white transition-colors">
                   {mood.name}
                 </h3>
-                <p className="text-white/80 text-base md:text-lg font-elegant group-hover:text-white transition-all duration-300">
+                <p className="text-white/70 text-sm md:text-base font-light group-hover:text-white/90 transition-colors">
                   {mood.description}
                 </p>
               </div>
             </div>
 
-            {/* Enhanced Particle Effect */}
+            {/* Hover Particle Effect */}
             {hoveredMood === mood.id && (
               <div className="absolute inset-0 pointer-events-none">
-                {Array.from({ length: 12 }).map((_, i) => (
+                {Array.from({ length: 8 }).map((_, i) => (
                   <div
                     key={i}
-                    className="absolute rounded-full opacity-70 animate-ping"
+                    className="absolute w-1 h-1 rounded-full opacity-60 animate-ping"
                     style={{
                       backgroundColor: `hsl(var(--${mood.color}))`,
-                      width: `${Math.random() * 6 + 2}px`,
-                      height: `${Math.random() * 6 + 2}px`,
-                      left: `${10 + Math.random() * 80}%`,
-                      top: `${10 + Math.random() * 80}%`,
-                      animationDelay: `${i * 0.15}s`,
-                      animationDuration: '1.8s',
-                      boxShadow: `0 0 10px hsl(var(--${mood.color}))`,
+                      left: `${20 + Math.random() * 60}%`,
+                      top: `${20 + Math.random() * 60}%`,
+                      animationDelay: `${i * 0.2}s`,
+                      animationDuration: '2s',
                     }}
                   />
                 ))}
@@ -177,12 +156,10 @@ const MoodTiles = ({ onMoodSelect }: MoodTilesProps) => {
         ))}
       </div>
 
-      <div className="text-center mt-16 fade-in-up" style={{ animationDelay: '0.8s' }}>
-        <div className="kp-signature text-2xl mb-2">KP's</div>
-        <p className="text-sm text-muted-foreground/60 font-elegant">
-          Each mood unlocks a portal to transcendent musical dimensions
+      <div className="text-center mt-12 fade-in-up" style={{ animationDelay: '0.6s' }}>
+        <p className="text-sm text-muted-foreground/60 font-light">
+          Each mood brings a unique sonic journey crafted just for you
         </p>
-        <div className="mt-4 h-px bg-gradient-gold opacity-30 max-w-xs mx-auto"></div>
       </div>
     </div>
   );

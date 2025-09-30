@@ -1,90 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* MoodiFy KP - Anime Web Series Inspired Design System */
+/* MoodiFy KP - Anime-inspired Design System */
 
 @layer base {
   :root {
-    /* Deep Space Anime Theme */
-    --background: 240 25% 4%;           /* Deep cosmic black */
-    --background-secondary: 250 20% 6%; /* Midnight purple */
-    --background-tertiary: 260 25% 8%;  /* Dark void */
-    --foreground: 0 0% 98%;             /* Pure white */
-    --foreground-secondary: 240 8% 85%; /* Soft white */
+    /* Anime-inspired Dark Theme */
+    --background: 240 15% 9%;
+    --background-secondary: 240 12% 12%;
+    --foreground: 240 5% 95%;
 
-    /* Anime Neon Palette */
-    --primary: 320 85% 70%;          /* Vibrant Magenta Pink */
-    --primary-foreground: 240 25% 4%;
-    --primary-glow: 320 100% 80%;
-    --primary-soft: 320 60% 85%;
+    /* Soft Pastel Palette */
+    --primary: 280 65% 75%;          /* Soft Lilac */
+    --primary-foreground: 240 15% 9%;
+    --primary-glow: 280 80% 85%;
 
-    --secondary: 280 80% 65%;        /* Electric Purple */
-    --secondary-foreground: 240 25% 4%;
-    --secondary-glow: 280 100% 75%;
-    --secondary-soft: 280 55% 80%;
+    --secondary: 200 35% 70%;        /* Sage Green */
+    --secondary-foreground: 240 15% 9%;
+    --secondary-glow: 200 50% 80%;
 
-    --accent: 200 90% 60%;           /* Cyan Blue */
-    --accent-foreground: 240 25% 4%;
-    --accent-glow: 200 100% 70%;
-    --accent-soft: 200 70% 75%;
+    --accent: 340 55% 80%;           /* Peachy Pink */
+    --accent-foreground: 240 15% 9%;
+    --accent-glow: 340 70% 85%;
 
-    --gold: 45 100% 65%;             /* Anime Gold */
-    --gold-foreground: 240 25% 4%;
-    --gold-glow: 45 100% 75%;
-    --gold-soft: 45 80% 80%;
+    --mood-chill: 320 45% 75%;       /* Cherry Blossom */
+    --mood-melancholy: 220 30% 65%;  /* Soft Blue Grey */
+    --mood-workout: 15 75% 70%;      /* Sunset Orange */
+    --mood-focus: 160 40% 70%;       /* Mint Green */
+    --mood-love: 350 60% 75%;        /* Rose Pink */
+    --mood-party: 270 50% 75%;       /* Soft Purple */
 
-    --mood-chill: 300 70% 75%;       /* Sakura Pink */
-    --mood-melancholy: 240 60% 70%;  /* Moonlight Blue */
-    --mood-workout: 15 85% 65%;      /* Fire Orange */
-    --mood-focus: 160 70% 65%;       /* Forest Green */
-    --mood-love: 340 80% 70%;        /* Passion Red */
-    --mood-party: 270 80% 70%;       /* Cosmic Purple */
+    /* UI Elements */
+    --card: 240 15% 11%;
+    --card-foreground: 240 5% 90%;
+    --card-glass: 240 15% 15%;
 
-    /* UI Elements with Anime Glow */
-    --card: 250 25% 8%;
-    --card-foreground: 0 0% 95%;
-    --card-glass: 260 30% 10%;
-    --card-hover: 270 35% 12%;
+    --muted: 240 12% 18%;
+    --muted-foreground: 240 5% 70%;
 
-    --muted: 250 20% 15%;
-    --muted-foreground: 240 10% 65%;
+    --border: 240 15% 20%;
+    --input: 240 15% 15%;
+    --ring: 280 65% 75%;
 
-    --border: 260 25% 18%;
-    --border-glow: 320 70% 50%;
-    --input: 250 25% 10%;
-    --ring: 320 85% 70%;
+    --radius: 0.75rem;
 
-    --radius: 1rem;
-
-    /* Anime Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--secondary)));
-    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--accent)));
-    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--primary)));
-    --gradient-gold: linear-gradient(135deg, hsl(var(--gold)), hsl(var(--gold-glow)));
-    --gradient-cosmic: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--background-secondary)) 50%, hsl(var(--background-tertiary)) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 50%, hsl(var(--accent)) 100%);
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--secondary-glow)));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-glow)));
+    --gradient-bg: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background-secondary)) 100%);
     
-    /* Advanced Glassmorphism */
-    --glass-bg: hsla(var(--card-glass), 0.25);
-    --glass-border: hsla(var(--primary), 0.3);
-    --glass-bg-hover: hsla(var(--card-hover), 0.35);
-    --glass-border-hover: hsla(var(--primary-glow), 0.5);
+    /* Glassmorphism */
+    --glass-bg: hsla(var(--card-glass), 0.15);
+    --glass-border: hsla(var(--primary), 0.2);
     
-    /* Anime Glow Shadows */
-    --shadow-primary: 0 8px 32px hsla(var(--primary), 0.25);
-    --shadow-secondary: 0 8px 32px hsla(var(--secondary), 0.25);
-    --shadow-accent: 0 8px 32px hsla(var(--accent), 0.25);
-    --shadow-gold: 0 8px 32px hsla(var(--gold), 0.25);
-    --shadow-intense: 0 20px 60px hsla(var(--primary), 0.3);
-    --shadow-neon: 0 0 30px hsla(var(--primary-glow), 0.6);
-    --shadow-soft: 0 10px 30px hsla(var(--background-tertiary), 0.8);
+    /* Shadows with colored tints */
+    --shadow-primary: 0 8px 32px hsla(var(--primary), 0.15);
+    --shadow-secondary: 0 8px 32px hsla(var(--secondary), 0.15);
+    --shadow-accent: 0 8px 32px hsla(var(--accent), 0.15);
+    --shadow-elegant: 0 20px 60px hsla(var(--primary), 0.1);
 
-    /* Anime Animations */
-    --transition-smooth: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-    --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    --transition-elastic: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    --transition-glow: all 0.4s ease-in-out;
+    /* Animations */
+    --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   }
 }
 
@@ -94,127 +75,52 @@
   }
 
   body {
-    @apply bg-background text-foreground;
-    font-family: 'Noto Sans JP', sans-serif;
-    background: var(--gradient-cosmic);
+    @apply bg-background text-foreground font-['Inter',sans-serif];
+    background: var(--gradient-bg);
     min-height: 100vh;
-    overflow-x: hidden;
   }
 
   .font-japanese {
-    font-family: 'Noto Sans JP', sans-serif;
-  }
-
-  .font-calligraphy {
-    font-family: 'Dancing Script', cursive;
-  }
-
-  .font-elegant {
-    font-family: 'Crimson Text', serif;
+    font-family: 'Noto Sans JP', 'Inter', sans-serif;
   }
 }
 
 @layer components {
-  /* Anime Glassmorphism Components */
+  /* Glassmorphism Components */
   .glass-card {
     background: var(--glass-bg);
-    backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-soft);
-    transition: var(--transition-smooth);
-  }
-
-  .glass-card:hover {
-    background: var(--glass-bg-hover);
-    border-color: var(--glass-border-hover);
-    box-shadow: var(--shadow-neon);
-    transform: translateY(-4px);
+    box-shadow: var(--shadow-elegant);
   }
 
   .glass-button {
     background: var(--glass-bg);
-    backdrop-filter: blur(20px) saturate(180%);
+    backdrop-filter: blur(16px);
     border: 1px solid var(--glass-border);
-    transition: var(--transition-elastic);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .glass-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, hsla(var(--primary-glow), 0.3), transparent);
-    transition: left 0.5s ease;
-  }
-
-  .glass-button:hover::before {
-    left: 100%;
+    transition: var(--transition-smooth);
   }
 
   .glass-button:hover {
-    background: var(--glass-bg-hover);
-    border-color: var(--glass-border-hover);
-    transform: translateY(-2px) scale(1.02);
+    background: hsla(var(--card-glass), 0.25);
+    transform: translateY(-2px);
     box-shadow: var(--shadow-primary);
   }
 
-  /* Neon Text Effect */
-  .neon-text {
-    color: hsl(var(--primary));
-    text-shadow: 
-      0 0 5px hsl(var(--primary-glow)),
-      0 0 10px hsl(var(--primary-glow)),
-      0 0 15px hsl(var(--primary-glow)),
-      0 0 20px hsl(var(--primary));
-    animation: neon-flicker 2s infinite alternate;
-  }
-
-  @keyframes neon-flicker {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.8; }
-  }
-
-  /* Floating KP Signature */
-  .kp-signature {
-    font-family: 'Dancing Script', cursive;
-    background: var(--gradient-gold);
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    font-weight: 700;
-    text-shadow: 0 0 20px hsla(var(--gold-glow), 0.5);
-    animation: kp-glow 3s ease-in-out infinite alternate;
-  }
-
-  @keyframes kp-glow {
-    0% { 
-      filter: brightness(1) drop-shadow(0 0 5px hsla(var(--gold), 0.5)); 
-    }
-    100% { 
-      filter: brightness(1.2) drop-shadow(0 0 15px hsla(var(--gold-glow), 0.8)); 
-    }
-  }
-
-  /* Anime Mood Tile Styles */
+  /* Mood Tile Styles */
   .mood-tile {
     position: relative;
     overflow: hidden;
     background: var(--glass-bg);
-    backdrop-filter: blur(24px) saturate(180%);
-    border: 2px solid var(--glass-border);
-    transition: var(--transition-elastic);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    transition: var(--transition-smooth);
     cursor: pointer;
-    border-radius: var(--radius);
   }
 
   .mood-tile:hover {
-    transform: translateY(-12px) scale(1.05) rotateY(5deg);
-    box-shadow: var(--shadow-intense);
-    border-color: var(--glass-border-hover);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-elegant);
   }
 
   .mood-tile::before {
@@ -224,10 +130,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, 
-      hsla(var(--primary), 0.1), 
-      hsla(var(--secondary), 0.1), 
-      hsla(var(--accent), 0.1));
+    background: linear-gradient(135deg, transparent, hsla(var(--primary), 0.1));
     opacity: 0;
     transition: var(--transition-smooth);
   }
@@ -236,218 +139,92 @@
     opacity: 1;
   }
 
-  /* Anime Power Glow */
-  .power-glow {
-    position: relative;
+  /* Floating Particles Animation */
+  .floating-particles {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 1;
   }
 
-  .power-glow::after {
-    content: '';
+  .particle {
     position: absolute;
-    inset: -2px;
-    background: var(--gradient-hero);
-    border-radius: inherit;
+    background: hsla(var(--primary), 0.3);
+    border-radius: 50%;
+    animation: float 20s infinite linear;
+  }
+
+  @keyframes float {
+    0% {
+      transform: translateY(100vh) rotate(0deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-100px) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  /* Breathing Animation */
+  .breathe {
+    animation: breathe 4s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  /* Audio Visualizer */
+  .visualizer-bar {
+    background: var(--gradient-primary);
+    animation: visualize 1.5s ease-in-out infinite alternate;
+  }
+
+  @keyframes visualize {
+    0% {
+      height: 4px;
+    }
+    100% {
+      height: 20px;
+    }
+  }
+
+  /* Scroll Animations */
+  .fade-in-up {
     opacity: 0;
-    z-index: -1;
-    transition: var(--transition-glow);
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease-out forwards;
   }
 
-  .power-glow:hover::after {
-    opacity: 0.7;
-    animation: pulse-glow 1.5s ease-in-out infinite;
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
-  @keyframes pulse-glow {
-    0%, 100% { transform: scale(1); opacity: 0.7; }
-    50% { transform: scale(1.05); opacity: 1; }
-  }
-
-  /* Anime Energy Aura */
-  .energy-aura {
-    position: relative;
-  }
-
-  .energy-aura::before {
-    content: '';
-    position: absolute;
-    inset: -10px;
-    background: conic-gradient(
-      from 0deg,
-      hsl(var(--primary)),
-      hsl(var(--secondary)),
-      hsl(var(--accent)),
-      hsl(var(--primary))
-    );
-    border-radius: inherit;
-    opacity: 0;
-    z-index: -1;
-    animation: energy-rotate 4s linear infinite;
-    filter: blur(20px);
+  /* Music Progress Bar */
+  .progress-bar {
+    background: var(--gradient-primary);
     transition: var(--transition-smooth);
   }
 
-  .energy-aura:hover::before {
-    opacity: 0.6;
-  }
-
-  @keyframes energy-rotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
-  /* Sakura Petals Effect */
-  .sakura-effect {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .sakura-effect::after {
-    content: '';
-    position: absolute;
-    width: 6px;
-    height: 6px;
-    background: hsl(var(--mood-chill));
-    border-radius: 50%;
-    opacity: 0;
-    animation: sakura-fall 3s linear infinite;
-  }
-
-  @keyframes sakura-fall {
-    0% {
-      transform: translateY(-10px) translateX(0) rotate(0deg);
-      opacity: 0;
-    }
-    20% {
-      opacity: 1;
-    }
-    80% {
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(100px) translateX(20px) rotate(360deg);
-      opacity: 0;
-    }
-  }
-
-  /* Anime Breathing Animation */
-  .breathe {
-    animation: anime-breathe 3s ease-in-out infinite;
-  }
-
-  @keyframes anime-breathe {
-    0%, 100% {
-      transform: scale(1);
-      filter: brightness(1);
-    }
-    50% {
-      transform: scale(1.03);
-      filter: brightness(1.1);
-    }
-  }
-
-  /* Floating Animation */
-  .float {
-    animation: float-gentle 6s ease-in-out infinite;
-  }
-
-  @keyframes float-gentle {
-    0%, 100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-
-  /* Anime Audio Visualizer */
-  .visualizer-bar {
-    background: var(--gradient-hero);
-    animation: anime-visualize 1.2s ease-in-out infinite alternate;
-    border-radius: 2px;
-    box-shadow: 0 0 10px hsla(var(--primary), 0.5);
-  }
-
-  @keyframes anime-visualize {
-    0% {
-      height: 6px;
-      box-shadow: 0 0 5px hsla(var(--primary), 0.3);
-    }
-    100% {
-      height: 24px;
-      box-shadow: 0 0 15px hsla(var(--primary-glow), 0.8);
-    }
-  }
-
-  /* Anime Entrance Animations */
-  .fade-in-up {
-    opacity: 0;
-    transform: translateY(40px) scale(0.9);
-    animation: anime-fade-in-up 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-  }
-
-  @keyframes anime-fade-in-up {
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  .slide-in-left {
-    opacity: 0;
-    transform: translateX(-50px);
-    animation: slide-in-left 0.6s ease-out forwards;
-  }
-
-  @keyframes slide-in-left {
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  .scale-in {
-    opacity: 0;
-    transform: scale(0.8);
-    animation: scale-in 0.5s ease-out forwards;
-  }
-
-  @keyframes scale-in {
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  /* Anime Music Progress Bar */
-  .progress-bar {
-    background: var(--gradient-hero);
-    transition: var(--transition-glow);
-    border-radius: 10px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .progress-bar::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, hsla(var(--primary-glow), 0.8), transparent);
-    animation: progress-shimmer 2s infinite;
-  }
-
-  @keyframes progress-shimmer {
-    0% { left: -100%; }
-    100% { left: 100%; }
-  }
-
   .progress-bar:hover {
-    box-shadow: 
-      0 0 20px hsla(var(--primary), 0.8),
-      0 0 40px hsla(var(--primary-glow), 0.4);
-    transform: scaleY(1.2);
+    box-shadow: 0 0 20px hsla(var(--primary), 0.6);
   }
 }
 
