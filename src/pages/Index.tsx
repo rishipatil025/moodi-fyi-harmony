@@ -3,6 +3,7 @@ import MoodTiles from "@/components/MoodTiles";
 import PlaylistView from "@/components/PlaylistView";
 import MusicPlayer from "@/components/MusicPlayer";
 import FloatingParticles from "@/components/FloatingParticles";
+import AnimeBackground from "@/components/AnimeBackground";
 import { SearchBar } from "@/components/SearchBar";
 import { PlaylistManager } from "@/components/PlaylistManager";
 import { useMusicPlayer } from "@/hooks/useMusicPlayer";
@@ -117,7 +118,8 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden">
+      <AnimeBackground />
       <FloatingParticles />
       
       <div className="relative z-10 p-8">
