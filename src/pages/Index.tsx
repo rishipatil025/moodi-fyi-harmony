@@ -3,6 +3,7 @@ import MoodTiles from "@/components/MoodTiles";
 import PlaylistView from "@/components/PlaylistView";
 import MusicPlayer from "@/components/MusicPlayer";
 import FloatingParticles from "@/components/FloatingParticles";
+import AnimeBackground from "@/components/AnimeBackground";
 import { SearchBar } from "@/components/SearchBar";
 import { PlaylistManager } from "@/components/PlaylistManager";
 import { useMusicPlayer } from "@/hooks/useMusicPlayer";
@@ -117,21 +118,26 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-cosmic relative overflow-hidden">
+      <AnimeBackground />
       <FloatingParticles />
       
       <div className="relative z-10 p-8">
         <div className="max-w-6xl mx-auto">
-          <header className="text-center mb-8">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent">
-              MoodiFy KP
-            </h1>
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-6">
-              Experience music through your emotions. Choose your current mood and let us curate the perfect soundtrack for your soul.
+          <header className="text-center mb-8 fade-in-up">
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <div className="kp-signature text-6xl md:text-8xl animate-pulse">KP</div>
+              <div className="h-16 w-px bg-gradient-gold opacity-60"></div>
+              <h1 className="text-4xl md:text-6xl font-japanese font-light neon-text">
+                MoodiFy
+              </h1>
+            </div>
+            <p className="text-lg text-foreground-secondary max-w-2xl mx-auto mb-6 font-elegant">
+              Experience music through your soul's deepest emotions. Let the rhythm of your heart guide the symphony of your journey.
             </p>
             
-            {/* Navigation */}
-            <div className="flex justify-center gap-4 mb-8">
+            {/* Anime Navigation */}
+            <div className="flex justify-center gap-6 mb-8 scale-in" style={{ animationDelay: '0.3s' }}>
               <Button
                 variant={currentView === 'moods' ? 'default' : 'outline'}
                 onClick={() => {
@@ -139,26 +145,26 @@ const Index = () => {
                   setShowPlaylist(false);
                   setSelectedMood(null);
                 }}
-                className="flex items-center gap-2"
+                className="glass-button energy-aura px-6 py-3 text-base font-japanese"
               >
-                <Home className="h-4 w-4" />
-                Moods
+                <Home className="h-5 w-5 mr-2" />
+                心境 Moods
               </Button>
               <Button
                 variant={currentView === 'search' ? 'default' : 'outline'}
                 onClick={() => setCurrentView('search')}
-                className="flex items-center gap-2"
+                className="glass-button energy-aura px-6 py-3 text-base font-japanese"
               >
-                <Search className="h-4 w-4" />
-                Search
+                <Search className="h-5 w-5 mr-2" />
+                探索 Search
               </Button>
               <Button
                 variant={currentView === 'playlists' ? 'default' : 'outline'}
                 onClick={() => setCurrentView('playlists')}
-                className="flex items-center gap-2"
+                className="glass-button energy-aura px-6 py-3 text-base font-japanese"
               >
-                <Music className="h-4 w-4" />
-                Playlists ({playlists.length})
+                <Music className="h-5 w-5 mr-2" />
+                音楽 Playlists ({playlists.length})
               </Button>
             </div>
           </header>
