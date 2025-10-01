@@ -3,7 +3,6 @@ import MoodTiles from "@/components/MoodTiles";
 import PlaylistView from "@/components/PlaylistView";
 import MusicPlayer from "@/components/MusicPlayer";
 import FloatingParticles from "@/components/FloatingParticles";
-import AnimeBackground from "@/components/AnimeBackground";
 import { SearchBar } from "@/components/SearchBar";
 import { PlaylistManager } from "@/components/PlaylistManager";
 import { useMusicPlayer } from "@/hooks/useMusicPlayer";
@@ -118,53 +117,48 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      <AnimeBackground />
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
       <FloatingParticles />
       
       <div className="relative z-10 p-8">
         <div className="max-w-6xl mx-auto">
-          <header className="text-center mb-12">
-            <div className="mb-6">
-              <span className="text-gold font-calligraphy text-5xl md:text-6xl neon-text">KP</span>
-              <h1 className="text-5xl md:text-7xl font-bold font-japanese mt-2 neon-text bg-gradient-primary bg-clip-text text-transparent">
-                MoodiFy
-              </h1>
-              <p className="text-sm text-foreground-secondary font-japanese mt-1">ムードで音楽を</p>
-            </div>
-            <p className="text-lg text-foreground-secondary max-w-2xl mx-auto mb-8 font-elegant">
+          <header className="text-center mb-8">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent">
+              MoodiFy KP
+            </h1>
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-6">
               Experience music through your emotions. Choose your current mood and let us curate the perfect soundtrack for your soul.
             </p>
             
             {/* Navigation */}
-            <div className="flex flex-wrap justify-center gap-3 mb-8">
+            <div className="flex justify-center gap-4 mb-8">
               <Button
-                variant={currentView === 'moods' ? 'default' : 'ghost'}
+                variant={currentView === 'moods' ? 'default' : 'outline'}
                 onClick={() => {
                   setCurrentView('moods');
                   setShowPlaylist(false);
                   setSelectedMood(null);
                 }}
-                className="glass-button flex items-center gap-2 px-6 py-3 text-base"
+                className="flex items-center gap-2"
               >
-                <Home className="h-5 w-5" />
-                <span className="font-japanese">Moods</span>
+                <Home className="h-4 w-4" />
+                Moods
               </Button>
               <Button
-                variant={currentView === 'search' ? 'default' : 'ghost'}
+                variant={currentView === 'search' ? 'default' : 'outline'}
                 onClick={() => setCurrentView('search')}
-                className="glass-button flex items-center gap-2 px-6 py-3 text-base"
+                className="flex items-center gap-2"
               >
-                <Search className="h-5 w-5" />
-                <span className="font-japanese">Search</span>
+                <Search className="h-4 w-4" />
+                Search
               </Button>
               <Button
-                variant={currentView === 'playlists' ? 'default' : 'ghost'}
+                variant={currentView === 'playlists' ? 'default' : 'outline'}
                 onClick={() => setCurrentView('playlists')}
-                className="glass-button flex items-center gap-2 px-6 py-3 text-base"
+                className="flex items-center gap-2"
               >
-                <Music className="h-5 w-5" />
-                <span className="font-japanese">Playlists ({playlists.length})</span>
+                <Music className="h-4 w-4" />
+                Playlists ({playlists.length})
               </Button>
             </div>
           </header>
