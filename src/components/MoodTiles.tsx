@@ -76,82 +76,83 @@ const MoodTiles = ({ onMoodSelect }: MoodTilesProps) => {
   const [hoveredMood, setHoveredMood] = useState<string | null>(null);
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4">
-      <div className="text-center mb-12 fade-in-up">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-light mb-4 font-japanese bg-gradient-primary bg-clip-text text-transparent">
-          What's your mood today, KP?
-        </h1>
-        <p className="text-lg text-muted-foreground font-light">
-          Select a vibe and let the music flow through your soul
-        </p>
+    <div className="fade-in-up">
+      <div className="text-center mb-8">
+        <span className="text-gold-soft font-calligraphy text-3xl">KP's</span>
+        <h2 className="text-3xl font-bold font-japanese mt-2 text-primary-glow">Mood Collection</h2>
+        <p className="text-foreground-secondary font-elegant mt-2">あなたの気分を選んでください</p>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-        {moods.map((mood, index) => (
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 p-6">
+        {moods.map((mood) => (
           <div
             key={mood.id}
-            className={`mood-tile relative h-48 md:h-56 lg:h-64 rounded-2xl cursor-pointer transition-all duration-500 fade-in-up group ${
-              hoveredMood === mood.id ? 'scale-105' : ''
-            }`}
-            style={{
-              backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url(${mood.bgImage})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              animationDelay: `${index * 0.1}s`,
-            }}
             onClick={() => onMoodSelect(mood)}
             onMouseEnter={() => setHoveredMood(mood.id)}
             onMouseLeave={() => setHoveredMood(null)}
+            className="mood-tile glass-card group relative h-80 rounded-2xl overflow-hidden cursor-pointer transform transition-all duration-500 hover:scale-105 hover:shadow-neon hover:rotate-1"
           >
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent rounded-2xl" />
+            {/* Background Image */}
+            <div
+              className="absolute inset-0 bg-cover bg-center transition-all duration-700 group-hover:scale-125 group-hover:brightness-110"
+              style={{
+                backgroundImage: `url(${mood.bgImage})`,
+              }}
+            />
+            
+            {/* Animated Gradient Overlay */}
+            <div 
+              className="absolute inset-0 opacity-80 group-hover:opacity-90 transition-opacity duration-500"
+              style={{
+                background: `linear-gradient(135deg, ${mood.color}40 0%, ${mood.color}20 50%, transparent 100%)`,
+              }}
+            />
             
             {/* Glow Effect */}
             <div 
-              className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-500`}
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
               style={{
-                background: `radial-gradient(circle at center, hsl(var(--${mood.color})) 0%, transparent 70%)`,
+                boxShadow: `inset 0 0 60px ${mood.color}60`,
               }}
             />
-
+            
             {/* Content */}
-            <div className="absolute inset-0 flex flex-col justify-between p-6 z-10">
-              {/* Emoji */}
-              <div className="self-end">
-                <span className="text-4xl md:text-5xl opacity-80 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
-                  {mood.emoji}
-                </span>
+            <div className="relative h-full p-8 flex flex-col justify-end z-10">
+              <div className="text-7xl mb-4 transform transition-all duration-500 group-hover:scale-125 group-hover:-rotate-12 breathe">
+                {mood.emoji}
               </div>
-
-              {/* Mood Info */}
-              <div className="space-y-2">
-                <h3 className="text-2xl md:text-3xl font-medium text-white font-japanese group-hover:text-white transition-colors">
-                  {mood.name}
-                </h3>
-                <p className="text-white/70 text-sm md:text-base font-light group-hover:text-white/90 transition-colors">
-                  {mood.description}
-                </p>
-              </div>
+              <h3 className="text-3xl font-bold font-japanese text-white mb-3 transform transition-all duration-500 group-hover:translate-x-3 neon-text">
+                {mood.name}
+              </h3>
+              <p className="text-sm text-gray-200 font-elegant opacity-0 group-hover:opacity-100 transform translate-y-6 group-hover:translate-y-0 transition-all duration-500 delay-75">
+                {mood.description}
+              </p>
             </div>
-
-            {/* Hover Particle Effect */}
+            
+            {/* Enhanced Hover Effect Particles */}
             {hoveredMood === mood.id && (
-              <div className="absolute inset-0 pointer-events-none">
-                {Array.from({ length: 8 }).map((_, i) => (
+              <div className="absolute inset-0 pointer-events-none overflow-hidden">
+                {[...Array(12)].map((_, i) => (
                   <div
                     key={i}
-                    className="absolute w-1 h-1 rounded-full opacity-60 animate-ping"
+                    className="absolute rounded-full"
                     style={{
-                      backgroundColor: `hsl(var(--${mood.color}))`,
-                      left: `${20 + Math.random() * 60}%`,
-                      top: `${20 + Math.random() * 60}%`,
-                      animationDelay: `${i * 0.2}s`,
-                      animationDuration: '2s',
+                      width: `${Math.random() * 8 + 4}px`,
+                      height: `${Math.random() * 8 + 4}px`,
+                      left: `${Math.random() * 100}%`,
+                      top: `${Math.random() * 100}%`,
+                      background: `radial-gradient(circle, ${mood.color} 0%, transparent 70%)`,
+                      animation: `float ${Math.random() * 3 + 2}s ease-in-out infinite`,
+                      animationDelay: `${i * 0.1}s`,
+                      opacity: Math.random() * 0.8 + 0.2,
                     }}
                   />
                 ))}
               </div>
             )}
+            
+            {/* Corner Accent */}
+            <div className="absolute top-4 right-4 w-12 h-12 border-t-2 border-r-2 border-white/30 rounded-tr-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
           </div>
         ))}
       </div>

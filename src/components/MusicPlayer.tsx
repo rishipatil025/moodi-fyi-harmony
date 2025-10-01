@@ -64,143 +64,92 @@ const MusicPlayer = ({
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-white/10 p-4">
-      <div className="max-w-7xl mx-auto flex items-center gap-4">
-        {/* Current Track Info */}
-        <div className="flex items-center gap-3 min-w-0 flex-1 max-w-xs">
-          <div className="relative group">
-            <img
-              src={currentTrack.albumArt}
-              alt={currentTrack.album}
-              className="w-14 h-14 rounded-lg object-cover shadow-lg transition-all duration-300 group-hover:scale-105"
-            />
-            <div className="absolute inset-0 bg-black/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+    <div className="fixed bottom-0 left-0 right-0 glass-card border-t-2 border-primary/30 p-6 z-50 shadow-intense">
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row items-center gap-6">
+          {/* Track Info */}
+          <div className="flex items-center gap-6 flex-1 min-w-0">
+            <div className="relative group">
+              <img
+                src={currentTrack.albumArt}
+                alt={currentTrack.album}
+                className="w-20 h-20 rounded-xl object-cover flex-shrink-0 shadow-neon breathe"
+              />
+              <div className="absolute inset-0 rounded-xl bg-gradient-primary opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="font-bold font-japanese text-xl text-white truncate neon-text">{currentTrack.title}</h3>
+              <p className="text-sm text-foreground-secondary truncate font-elegant mt-1">{currentTrack.artist}</p>
+            </div>
           </div>
-          
-          <div className="min-w-0 flex-1">
-            <h4 className="font-medium text-foreground truncate font-japanese">
-              {currentTrack.title}
-            </h4>
-            <p className="text-sm text-muted-foreground truncate">
-              {currentTrack.artist}
-            </p>
-          </div>
-          
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsLiked(!isLiked)}
-            className={`opacity-70 hover:opacity-100 transition-all ${
-              isLiked ? 'text-mood-love' : 'text-muted-foreground'
-            }`}
-          >
-            <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
-          </Button>
-        </div>
 
-        {/* Main Controls */}
-        <div className="flex flex-col items-center gap-2 flex-1 max-w-2xl">
-          <div className="flex items-center gap-2">
+          {/* Controls */}
+          <div className="flex items-center gap-6">
             <Button
-              variant="ghost"
               size="sm"
-              onClick={() => setIsShuffled(!isShuffled)}
-              className={`opacity-70 hover:opacity-100 transition-all ${
-                isShuffled ? 'text-primary' : 'text-muted-foreground'
-              }`}
-            >
-              <Shuffle className="w-4 h-4" />
-            </Button>
-            
-            <Button
               variant="ghost"
-              size="sm"
               onClick={onPrevious}
-              className="opacity-70 hover:opacity-100 transition-all"
+              className="text-white hover:text-primary-glow hover:scale-110 transition-all duration-300"
             >
-              <SkipBack className="w-5 h-5" />
+              <SkipBack className="h-6 w-6" />
             </Button>
-            
             <Button
+              size="lg"
               onClick={onPlayPause}
-              className="w-12 h-12 rounded-full bg-gradient-primary shadow-primary hover:shadow-lg transition-all duration-300 hover:scale-105"
+              className="w-16 h-16 rounded-full bg-gradient-primary shadow-neon hover:shadow-intense hover:scale-110 transition-all duration-300"
             >
-              {isPlaying ? (
-                <Pause className="w-5 h-5 text-background" />
-              ) : (
-                <Play className="w-5 h-5 text-background ml-0.5" />
-              )}
+              {isPlaying ? <Pause className="h-7 w-7" /> : <Play className="h-7 w-7 ml-1" />}
             </Button>
-            
             <Button
-              variant="ghost"
               size="sm"
+              variant="ghost"
               onClick={onNext}
-              className="opacity-70 hover:opacity-100 transition-all"
+              className="text-white hover:text-primary-glow hover:scale-110 transition-all duration-300"
             >
-              <SkipForward className="w-5 h-5" />
-            </Button>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                const modes: Array<'off' | 'all' | 'one'> = ['off', 'all', 'one'];
-                const currentIndex = modes.indexOf(repeatMode);
-                setRepeatMode(modes[(currentIndex + 1) % modes.length]);
-              }}
-              className={`opacity-70 hover:opacity-100 transition-all ${
-                repeatMode !== 'off' ? 'text-primary' : 'text-muted-foreground'
-              }`}
-            >
-              <Repeat className="w-4 h-4" />
-              {repeatMode === 'one' && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />
-              )}
+              <SkipForward className="h-6 w-6" />
             </Button>
           </div>
-          
-          {/* Progress Bar */}
-          <div className="flex items-center gap-3 w-full max-w-md">
-            <span className="text-xs text-muted-foreground font-mono">
-              {formatTime(currentTime)}
-            </span>
-            
-            <div className="flex-1">
+
+          {/* Volume & Progress */}
+          <div className="flex items-center gap-6 flex-1 min-w-0">
+            <div className="flex-1 min-w-0">
               <Slider
                 value={[currentTime]}
                 max={currentTrack.duration}
                 step={1}
                 onValueChange={([value]) => onSeek(value)}
-                className="w-full"
+                className="cursor-pointer progress-bar"
               />
+              <div className="flex justify-between text-xs text-foreground-secondary font-japanese mt-2">
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(currentTrack.duration)}</span>
+              </div>
             </div>
-            
-            <span className="text-xs text-muted-foreground font-mono">
-              {formatTime(currentTrack.duration)}
-            </span>
-          </div>
-        </div>
-
-        {/* Audio Visualizer & Volume */}
-        <div className="flex items-center gap-4 min-w-0 flex-1 max-w-xs justify-end">
-          {/* Audio Visualizer */}
-          <div className="hidden md:flex items-end gap-0.5 h-6">
-            {visualizerBars}
-          </div>
-          
-          {/* Volume Control */}
-          <div className="flex items-center gap-2">
-            <Volume2 className="w-4 h-4 text-muted-foreground" />
-            <div className="w-20">
+            <div className="flex items-center gap-3 min-w-[140px]">
+              <Volume2 className="h-5 w-5 text-primary-soft" />
               <Slider
                 value={[volume]}
                 max={100}
                 step={1}
                 onValueChange={([value]) => onVolumeChange(value)}
-                className="w-full"
+                className="w-28 cursor-pointer"
               />
             </div>
+          </div>
+
+          {/* Enhanced Audio Visualizer */}
+          <div className="flex items-end gap-1.5 h-12">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className={`w-1.5 bg-gradient-primary rounded-full transition-all duration-300 shadow-glow ${
+                  isPlaying ? 'visualizer-bar' : 'h-3'
+                }`}
+                style={{
+                  animationDelay: `${i * 0.1}s`,
+                }}
+              />
+            ))}
           </div>
         </div>
       </div>

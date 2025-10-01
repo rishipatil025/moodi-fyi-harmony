@@ -1,71 +1,63 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* MoodiFy KP - Anime-inspired Design System */
+/* MoodiFy KP - Enhanced Anime Design System */
 
 @layer base {
   :root {
-    /* Anime-inspired Dark Theme */
-    --background: 240 15% 9%;
-    --background-secondary: 240 12% 12%;
-    --foreground: 240 5% 95%;
-
-    /* Soft Pastel Palette */
-    --primary: 280 65% 75%;          /* Soft Lilac */
-    --primary-foreground: 240 15% 9%;
-    --primary-glow: 280 80% 85%;
-
-    --secondary: 200 35% 70%;        /* Sage Green */
-    --secondary-foreground: 240 15% 9%;
-    --secondary-glow: 200 50% 80%;
-
-    --accent: 340 55% 80%;           /* Peachy Pink */
-    --accent-foreground: 240 15% 9%;
-    --accent-glow: 340 70% 85%;
-
-    --mood-chill: 320 45% 75%;       /* Cherry Blossom */
-    --mood-melancholy: 220 30% 65%;  /* Soft Blue Grey */
-    --mood-workout: 15 75% 70%;      /* Sunset Orange */
-    --mood-focus: 160 40% 70%;       /* Mint Green */
-    --mood-love: 350 60% 75%;        /* Rose Pink */
-    --mood-party: 270 50% 75%;       /* Soft Purple */
-
+    /* Deep Space Anime Theme */
+    --background: 250 40% 8%;
+    --background-secondary: 250 35% 12%;
+    --background-tertiary: 250 30% 16%;
+    --foreground: 280 20% 98%;
+    --foreground-secondary: 280 15% 85%;
+    
+    /* Anime Neon Palette */
+    --primary: 280 85% 65%;
+    --primary-soft: 280 75% 75%;
+    --primary-glow: 280 90% 80%;
+    --secondary: 195 85% 60%;
+    --secondary-soft: 195 75% 70%;
+    --accent: 330 85% 65%;
+    --accent-soft: 330 75% 75%;
+    --gold: 45 90% 60%;
+    --gold-soft: 45 80% 70%;
+    
+    /* Mood Colors - Vibrant */
+    --mood-chill: 200 85% 65%;
+    --mood-focus: 160 80% 55%;
+    --mood-party: 320 85% 65%;
+    --mood-workout: 10 90% 60%;
+    --mood-melancholy: 240 70% 60%;
+    --mood-love: 340 85% 70%;
+    
     /* UI Elements */
-    --card: 240 15% 11%;
-    --card-foreground: 240 5% 90%;
-    --card-glass: 240 15% 15%;
-
-    --muted: 240 12% 18%;
-    --muted-foreground: 240 5% 70%;
-
-    --border: 240 15% 20%;
-    --input: 240 15% 15%;
-    --ring: 280 65% 75%;
-
-    --radius: 0.75rem;
-
+    --card: 250 35% 12%;
+    --card-foreground: 280 20% 98%;
+    --popover: 250 40% 10%;
+    --popover-foreground: 280 20% 98%;
+    --muted: 250 30% 20%;
+    --muted-foreground: 280 15% 70%;
+    --border: 280 30% 25%;
+    --input: 250 30% 18%;
+    --ring: 280 85% 65%;
+    
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--secondary-glow)));
-    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-glow)));
-    --gradient-bg: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background-secondary)) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(280 85% 65%) 0%, hsl(195 85% 60%) 100%);
+    --gradient-secondary: linear-gradient(135deg, hsl(330 85% 65%) 0%, hsl(280 85% 65%) 100%);
+    --gradient-gold: linear-gradient(135deg, hsl(45 90% 60%) 0%, hsl(35 85% 55%) 100%);
+    --gradient-cosmic: linear-gradient(180deg, hsl(250 40% 8%) 0%, hsl(280 40% 12%) 50%, hsl(250 40% 8%) 100%);
     
-    /* Glassmorphism */
-    --glass-bg: hsla(var(--card-glass), 0.15);
-    --glass-border: hsla(var(--primary), 0.2);
+    /* Glass Effects */
+    --glass-bg: hsl(250 35% 12% / 0.4);
+    --glass-border: hsl(280 50% 70% / 0.2);
     
-    /* Shadows with colored tints */
-    --shadow-primary: 0 8px 32px hsla(var(--primary), 0.15);
-    --shadow-secondary: 0 8px 32px hsla(var(--secondary), 0.15);
-    --shadow-accent: 0 8px 32px hsla(var(--accent), 0.15);
-    --shadow-elegant: 0 20px 60px hsla(var(--primary), 0.1);
-
-    /* Animations */
-    --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    /* Shadows */
+    --shadow-glow: 0 0 40px hsl(280 85% 65% / 0.4);
+    --shadow-intense: 0 20px 60px -10px hsl(280 85% 65% / 0.5);
+    
+    --radius: 1rem;
   }
 }
 
@@ -73,167 +65,174 @@
   * {
     @apply border-border;
   }
-
   body {
-    @apply bg-background text-foreground font-['Inter',sans-serif];
-    background: var(--gradient-bg);
-    min-height: 100vh;
+    @apply bg-background text-foreground min-h-screen font-sans antialiased;
   }
-
+  
   .font-japanese {
-    font-family: 'Noto Sans JP', 'Inter', sans-serif;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  
+  .font-calligraphy {
+    font-family: 'Dancing Script', cursive;
+  }
+  
+  .font-elegant {
+    font-family: 'Crimson Text', serif;
   }
 }
 
-@layer components {
-  /* Glassmorphism Components */
-  .glass-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-elegant);
-  }
+/* Anime Glass Effects */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 hsl(280 85% 65% / 0.15);
+}
 
-  .glass-button {
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--glass-border);
-    transition: var(--transition-smooth);
-  }
+.glass-card:hover {
+  border-color: hsl(280 50% 70% / 0.4);
+  box-shadow: 0 8px 32px 0 hsl(280 85% 65% / 0.3);
+}
 
-  .glass-button:hover {
-    background: hsla(var(--card-glass), 0.25);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-primary);
-  }
+.glass-button {
+  background: hsl(280 85% 65% / 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid hsl(280 50% 70% / 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-  /* Mood Tile Styles */
-  .mood-tile {
-    position: relative;
-    overflow: hidden;
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    transition: var(--transition-smooth);
-    cursor: pointer;
-  }
+.glass-button:hover {
+  background: hsl(280 85% 65% / 0.2);
+  border-color: hsl(280 50% 70% / 0.5);
+  box-shadow: 0 0 20px hsl(280 85% 65% / 0.4);
+}
 
-  .mood-tile:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: var(--shadow-elegant);
-  }
+/* Neon Text Effect */
+.neon-text {
+  text-shadow: 0 0 10px hsl(280 85% 65% / 0.8),
+               0 0 20px hsl(280 85% 65% / 0.6),
+               0 0 30px hsl(280 85% 65% / 0.4);
+}
 
-  .mood-tile::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, transparent, hsla(var(--primary), 0.1));
+/* Anime Mood Tiles */
+.mood-tile {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mood-tile::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, hsl(280 85% 65% / 0.3) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.mood-tile:hover::before {
+  opacity: 1;
+  animation: power-glow 2s ease-in-out infinite;
+}
+
+@keyframes power-glow {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.1) rotate(180deg); }
+}
+
+/* Floating Particles */
+.floating-particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.particle {
+  position: absolute;
+  background: radial-gradient(circle, hsl(280 85% 65% / 0.6), transparent);
+  border-radius: 50%;
+  animation: float 20s infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0) translateX(0) scale(1);
     opacity: 0;
-    transition: var(--transition-smooth);
   }
-
-  .mood-tile:hover::before {
+  10% {
     opacity: 1;
   }
-
-  /* Floating Particles Animation */
-  .floating-particles {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    z-index: 1;
+  90% {
+    opacity: 1;
   }
-
-  .particle {
-    position: absolute;
-    background: hsla(var(--primary), 0.3);
-    border-radius: 50%;
-    animation: float 20s infinite linear;
-  }
-
-  @keyframes float {
-    0% {
-      transform: translateY(100vh) rotate(0deg);
-      opacity: 0;
-    }
-    10% {
-      opacity: 1;
-    }
-    90% {
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(-100px) rotate(360deg);
-      opacity: 0;
-    }
-  }
-
-  /* Breathing Animation */
-  .breathe {
-    animation: breathe 4s ease-in-out infinite;
-  }
-
-  @keyframes breathe {
-    0%, 100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.05);
-    }
-  }
-
-  /* Audio Visualizer */
-  .visualizer-bar {
-    background: var(--gradient-primary);
-    animation: visualize 1.5s ease-in-out infinite alternate;
-  }
-
-  @keyframes visualize {
-    0% {
-      height: 4px;
-    }
-    100% {
-      height: 20px;
-    }
-  }
-
-  /* Scroll Animations */
-  .fade-in-up {
+  100% {
+    transform: translateY(-100vh) translateX(100px) scale(0.5);
     opacity: 0;
-    transform: translateY(30px);
-    animation: fadeInUp 0.8s ease-out forwards;
-  }
-
-  @keyframes fadeInUp {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Music Progress Bar */
-  .progress-bar {
-    background: var(--gradient-primary);
-    transition: var(--transition-smooth);
-  }
-
-  .progress-bar:hover {
-    box-shadow: 0 0 20px hsla(var(--primary), 0.6);
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
+/* Breathing Animation */
+.breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
 
-  body {
-    @apply bg-background text-foreground;
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* Audio Visualizer */
+.visualizer-bar {
+  animation: visualizer 0.8s ease-in-out infinite;
+}
+
+@keyframes visualizer {
+  0%, 100% { height: 20%; }
+  50% { height: 100%; }
+}
+
+/* Fade In Up Animation */
+.fade-in-up {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Progress Bar Shimmer */
+.progress-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, hsl(280 85% 75% / 0.4), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
 }
