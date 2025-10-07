@@ -1,230 +1,55 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;600&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* MoodiFy KP - Anime-inspired Design System */
+/* MoodiFy KP - Studio Ghibli/Anime Design System */
 
 @layer base {
   :root {
-    /* Anime-inspired Dark Theme */
-    --background: 240 15% 9%;
-    --background-secondary: 240 12% 12%;
-    --foreground: 240 5% 95%;
+    /* Anime-inspired Color Palette */
+    --background: 240 35% 8%;
+    --background-secondary: 240 30% 12%;
+    --foreground: 0 0% 100%;
 
-    /* Soft Pastel Palette */
-    --primary: 280 65% 75%;          /* Soft Lilac */
-    --primary-foreground: 240 15% 9%;
-    --primary-glow: 280 80% 85%;
+    /* Primary Gradient Colors */
+    --primary: 280 70% 75%;          /* Soft Lilac */
+    --primary-foreground: 240 35% 8%;
+    --primary-glow: 320 80% 85%;     /* Pink glow */
 
-    --secondary: 200 35% 70%;        /* Sage Green */
-    --secondary-foreground: 240 15% 9%;
-    --secondary-glow: 200 50% 80%;
+    --secondary: 260 60% 70%;        /* Mid Violet */
+    --secondary-foreground: 0 0% 100%;
+    
+    --accent: 340 100% 87%;          /* Soft Pink */
+    --accent-foreground: 240 35% 8%;
 
-    --accent: 340 55% 80%;           /* Peachy Pink */
-    --accent-foreground: 240 15% 9%;
-    --accent-glow: 340 70% 85%;
-
-    --mood-chill: 320 45% 75%;       /* Cherry Blossom */
-    --mood-melancholy: 220 30% 65%;  /* Soft Blue Grey */
-    --mood-workout: 15 75% 70%;      /* Sunset Orange */
-    --mood-focus: 160 40% 70%;       /* Mint Green */
-    --mood-love: 350 60% 75%;        /* Rose Pink */
-    --mood-party: 270 50% 75%;       /* Soft Purple */
+    /* Mood-Specific Glow Colors */
+    --mood-chill: 200 100% 70%;      /* Cyan/Blue */
+    --mood-melancholy: 260 60% 65%;  /* Purple/Indigo */
+    --mood-workout: 10 100% 65%;     /* Red/Orange */
+    --mood-focus: 160 100% 70%;      /* Green/Mint */
+    --mood-love: 340 100% 87%;       /* Pink/Rose */
+    --mood-party: 45 100% 60%;       /* Yellow/Gold */
 
     /* UI Elements */
-    --card: 240 15% 11%;
-    --card-foreground: 240 5% 90%;
-    --card-glass: 240 15% 15%;
+    --card: 240 30% 12%;
+    --card-foreground: 0 0% 100%;
+    --muted: 240 20% 25%;
+    --muted-foreground: 240 10% 70%;
+    --border: 0 0% 100% / 0.15;
+    --input: 240 20% 18%;
+    --ring: 280 70% 75%;
 
-    --muted: 240 12% 18%;
-    --muted-foreground: 240 5% 70%;
+    --radius: 1.5rem;
 
-    --border: 240 15% 20%;
-    --input: 240 15% 15%;
-    --ring: 280 65% 75%;
+    /* Frosted Glass Variables */
+    --glass-bg: 255 255 255 / 0.1;
+    --glass-border: 255 255 255 / 0.3;
+    --glass-shadow: 45 27 105 / 0.3;
 
-    --radius: 0.75rem;
-
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
-    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--secondary-glow)));
-    --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-glow)));
-    --gradient-bg: linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--background-secondary)) 100%);
-    
-    /* Glassmorphism */
-    --glass-bg: hsla(var(--card-glass), 0.15);
-    --glass-border: hsla(var(--primary), 0.2);
-    
-    /* Shadows with colored tints */
-    --shadow-primary: 0 8px 32px hsla(var(--primary), 0.15);
-    --shadow-secondary: 0 8px 32px hsla(var(--secondary), 0.15);
-    --shadow-accent: 0 8px 32px hsla(var(--accent), 0.15);
-    --shadow-elegant: 0 20px 60px hsla(var(--primary), 0.1);
-
-    /* Animations */
-    --transition-smooth: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    --transition-bounce: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-  }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
-
-  body {
-    @apply bg-background text-foreground font-['Inter',sans-serif];
-    background: var(--gradient-bg);
-    min-height: 100vh;
-  }
-
-  .font-japanese {
-    font-family: 'Noto Sans JP', 'Inter', sans-serif;
-  }
-}
-
-@layer components {
-  /* Glassmorphism Components */
-  .glass-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-elegant);
-  }
-
-  .glass-button {
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px);
-    border: 1px solid var(--glass-border);
-    transition: var(--transition-smooth);
-  }
-
-  .glass-button:hover {
-    background: hsla(var(--card-glass), 0.25);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-primary);
-  }
-
-  /* Mood Tile Styles */
-  .mood-tile {
-    position: relative;
-    overflow: hidden;
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    transition: var(--transition-smooth);
-    cursor: pointer;
-  }
-
-  .mood-tile:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: var(--shadow-elegant);
-  }
-
-  .mood-tile::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, transparent, hsla(var(--primary), 0.1));
-    opacity: 0;
-    transition: var(--transition-smooth);
-  }
-
-  .mood-tile:hover::before {
-    opacity: 1;
-  }
-
-  /* Floating Particles Animation */
-  .floating-particles {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .particle {
-    position: absolute;
-    background: hsla(var(--primary), 0.3);
-    border-radius: 50%;
-    animation: float 20s infinite linear;
-  }
-
-  @keyframes float {
-    0% {
-      transform: translateY(100vh) rotate(0deg);
-      opacity: 0;
-    }
-    10% {
-      opacity: 1;
-    }
-    90% {
-      opacity: 1;
-    }
-    100% {
-      transform: translateY(-100px) rotate(360deg);
-      opacity: 0;
-    }
-  }
-
-  /* Breathing Animation */
-  .breathe {
-    animation: breathe 4s ease-in-out infinite;
-  }
-
-  @keyframes breathe {
-    0%, 100% {
-      transform: scale(1);
-    }
-    50% {
-      transform: scale(1.05);
-    }
-  }
-
-  /* Audio Visualizer */
-  .visualizer-bar {
-    background: var(--gradient-primary);
-    animation: visualize 1.5s ease-in-out infinite alternate;
-  }
-
-  @keyframes visualize {
-    0% {
-      height: 4px;
-    }
-    100% {
-      height: 20px;
-    }
-  }
-
-  /* Scroll Animations */
-  .fade-in-up {
-    opacity: 0;
-    transform: translateY(30px);
-    animation: fadeInUp 0.8s ease-out forwards;
-  }
-
-  @keyframes fadeInUp {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Music Progress Bar */
-  .progress-bar {
-    background: var(--gradient-primary);
-    transition: var(--transition-smooth);
-  }
-
-  .progress-bar:hover {
-    box-shadow: 0 0 20px hsla(var(--primary), 0.6);
+    /* Glow Effects */
+    --glow-white: 255 255 255 / 0.8;
+    --glow-pink: 255 183 197 / 0.4;
+    --glow-purple: 212 191 255 / 0.5;
   }
 }
 
@@ -235,5 +60,244 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Nunito', 'M PLUS Rounded 1c', sans-serif;
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .font-japanese {
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  .font-rounded {
+    font-family: 'M PLUS Rounded 1c', 'Nunito', sans-serif;
+  }
+}
+
+@layer components {
+  /* Frosted Glass Card */
+  .glass-card {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(20px) saturate(180%);
+    border: 1.5px solid hsl(var(--glass-border));
+    box-shadow: 0 8px 32px hsl(var(--glass-shadow));
+    border-radius: var(--radius);
+    transition: all 300ms ease-out;
+  }
+
+  .glass-card:hover {
+    transform: translateY(-4px);
+    background: hsl(255 255 255 / 0.15);
+    box-shadow: 0 12px 40px hsl(255 183 197 / 0.4);
+  }
+
+  /* Frosted Glass Button */
+  .glass-button {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1.5px solid hsl(var(--glass-border));
+    border-radius: 1.25rem;
+    transition: all 250ms ease-out;
+  }
+
+  .glass-button:hover {
+    background: hsl(255 255 255 / 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px hsl(var(--glow-pink));
+  }
+
+  /* Logo Gradient Text */
+  .logo-gradient {
+    background: linear-gradient(135deg, #FFFFFF 0%, #FFB7C5 50%, #D4BFFF 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px hsl(var(--glow-white)), 0 0 40px hsl(var(--glow-pink));
+    filter: drop-shadow(0 0 20px rgba(255,255,255,0.8)) drop-shadow(0 0 40px rgba(255,183,197,0.4));
+  }
+
+  /* Pulsing Glow Animation */
+  .pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      text-shadow: 0 0 10px rgba(255,255,255,0.6), 0 0 20px rgba(255,183,197,0.3);
+    }
+    50% {
+      text-shadow: 0 0 25px rgba(255,255,255,0.9), 0 0 50px rgba(255,183,197,0.6);
+    }
+  }
+
+  /* Mood Tile Hover Effects */
+  .mood-tile {
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(15px) saturate(180%);
+    background: hsl(255 255 255 / 0.08);
+    border: 1.5px solid hsl(var(--glass-border));
+    border-radius: 1.5rem;
+    transition: all 300ms ease-out;
+    cursor: pointer;
+  }
+
+  .mood-tile:hover {
+    transform: translateY(-8px);
+  }
+
+  .mood-tile:hover .mood-bg-image {
+    transform: scale(1.05);
+  }
+
+  .mood-tile:hover .mood-emoji {
+    transform: scale(1.1);
+    animation: bounce-emoji 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  @keyframes bounce-emoji {
+    0%, 100% { transform: scale(1.1); }
+    50% { transform: scale(1.25); }
+  }
+
+  /* Mood-Specific Glows */
+  .mood-chill:hover {
+    box-shadow: 0 12px 40px hsl(var(--mood-chill) / 0.5);
+  }
+
+  .mood-melancholy:hover {
+    box-shadow: 0 12px 40px hsl(var(--mood-melancholy) / 0.5);
+  }
+
+  .mood-workout:hover {
+    box-shadow: 0 12px 40px hsl(var(--mood-workout) / 0.5);
+  }
+
+  .mood-focus:hover {
+    box-shadow: 0 12px 40px hsl(var(--mood-focus) / 0.5);
+  }
+
+  .mood-love:hover {
+    box-shadow: 0 12px 40px hsl(var(--mood-love) / 0.5);
+  }
+
+  .mood-party:hover {
+    box-shadow: 0 12px 40px hsl(var(--mood-party) / 0.5);
+  }
+
+  /* Sakura Petal Animation */
+  .sakura-petal {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: #FFB7C5;
+    border-radius: 50% 0 50% 0;
+    opacity: 0.7;
+    filter: blur(1px);
+    animation: fall-petal 40s linear infinite;
+  }
+
+  @keyframes fall-petal {
+    0% {
+      transform: translateY(-10px) translateX(0) rotate(0deg);
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.7;
+    }
+    90% {
+      opacity: 0.7;
+    }
+    100% {
+      transform: translateY(100vh) translateX(100px) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  /* Twinkling Star Animation */
+  .twinkle-star {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.8; }
+  }
+
+  /* Ken Burns Background Effect */
+  .ken-burns {
+    animation: ken-burns 30s ease-in-out infinite alternate;
+  }
+
+  @keyframes ken-burns {
+    0% {
+      transform: scale(1);
+    }
+    100% {
+      transform: scale(1.05);
+    }
+  }
+
+  /* Smooth Breathing Animation */
+  .breathe {
+    animation: breathe 4s ease-in-out infinite;
+  }
+
+  @keyframes breathe {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.02);
+    }
+  }
+
+  /* Music Player Frosted Glass */
+  .player-glass {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(25px) saturate(180%);
+    border-top: 1.5px solid hsl(var(--glass-border));
+    box-shadow: 0 -4px 20px hsl(45 27 105 / 0.2);
+  }
+
+  /* Progress Bar */
+  .progress-track {
+    background: hsl(255 255 255 / 0.15);
+    backdrop-filter: blur(10px);
+  }
+
+  .progress-fill {
+    background: linear-gradient(90deg, #FFFFFF 0%, #FFB7C5 100%);
+    box-shadow: 0 0 10px rgba(255,183,197,0.5);
+  }
+
+  /* Control Button Glow */
+  .control-button {
+    background: hsl(var(--glass-bg));
+    backdrop-filter: blur(16px);
+    border: 1px solid hsl(var(--glass-border));
+    transition: all 250ms ease-out;
+  }
+
+  .control-button:hover {
+    box-shadow: 0 0 20px rgba(255,255,255,0.4);
+    background: hsl(255 255 255 / 0.2);
+  }
+
+  /* Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
