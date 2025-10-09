@@ -13,31 +13,40 @@ interface Track {
 }
 
 interface MusicPlayerProps {
-  currentTrack?: Track;
+  currentTrack: Track | null;
   isPlaying: boolean;
+  currentTime: number;
+  volume: number;
+  shuffle: boolean;
+  repeat: 'off' | 'all' | 'one';
+  isFavorite: boolean;
   onPlayPause: () => void;
   onNext: () => void;
   onPrevious: () => void;
-  currentTime: number;
   onSeek: (time: number) => void;
-  volume: number;
   onVolumeChange: (volume: number) => void;
+  onToggleShuffle: () => void;
+  onToggleRepeat: () => void;
+  onToggleFavorite: () => void;
 }
 
 const MusicPlayer = ({
   currentTrack,
   isPlaying,
+  currentTime,
+  volume,
+  shuffle,
+  repeat,
+  isFavorite,
   onPlayPause,
   onNext,
   onPrevious,
-  currentTime,
   onSeek,
-  volume,
   onVolumeChange,
+  onToggleShuffle,
+  onToggleRepeat,
+  onToggleFavorite,
 }: MusicPlayerProps) => {
-  const [isShuffled, setIsShuffled] = useState(false);
-  const [repeatMode, setRepeatMode] = useState<'off' | 'all' | 'one'>('off');
-  const [isLiked, setIsLiked] = useState(false);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -89,12 +98,12 @@ const MusicPlayer = ({
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setIsLiked(!isLiked)}
+            onClick={onToggleFavorite}
             className={`opacity-70 hover:opacity-100 transition-all ${
-              isLiked ? 'text-mood-love' : 'text-muted-foreground'
+              isFavorite ? 'text-mood-love' : 'text-muted-foreground'
             }`}
           >
-            <Heart className={`w-4 h-4 ${isLiked ? 'fill-current' : ''}`} />
+            <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
           </Button>
         </div>
 
@@ -104,9 +113,9 @@ const MusicPlayer = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsShuffled(!isShuffled)}
+              onClick={onToggleShuffle}
               className={`opacity-70 hover:opacity-100 transition-all ${
-                isShuffled ? 'text-primary' : 'text-muted-foreground'
+                shuffle ? 'text-primary' : 'text-muted-foreground'
               }`}
             >
               <Shuffle className="w-4 h-4" />
@@ -144,17 +153,13 @@ const MusicPlayer = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => {
-                const modes: Array<'off' | 'all' | 'one'> = ['off', 'all', 'one'];
-                const currentIndex = modes.indexOf(repeatMode);
-                setRepeatMode(modes[(currentIndex + 1) % modes.length]);
-              }}
+              onClick={onToggleRepeat}
               className={`opacity-70 hover:opacity-100 transition-all ${
-                repeatMode !== 'off' ? 'text-primary' : 'text-muted-foreground'
+                repeat !== 'off' ? 'text-primary' : 'text-muted-foreground'
               }`}
             >
               <Repeat className="w-4 h-4" />
-              {repeatMode === 'one' && (
+              {repeat === 'one' && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />
               )}
             </Button>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Edit, Trash2, Music, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Music, X, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,6 +20,7 @@ interface PlaylistManagerProps {
   onRenamePlaylist: (id: string, newName: string) => void;
   onRemoveFromPlaylist: (playlistId: string, trackId: string) => void;
   onPlayPlaylist: (playlist: Playlist) => void;
+  onExportPlaylist?: (playlistId: string) => void;
   currentTrack?: Track | null;
 }
 
@@ -30,6 +31,7 @@ export const PlaylistManager = ({
   onRenamePlaylist,
   onRemoveFromPlaylist,
   onPlayPlaylist,
+  onExportPlaylist,
   currentTrack
 }: PlaylistManagerProps) => {
   const [newPlaylistName, setNewPlaylistName] = useState('');
@@ -137,6 +139,15 @@ export const PlaylistManager = ({
                     >
                       Play All
                     </Button>
+                    {onExportPlaylist && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => onExportPlaylist(playlist.id)}
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="ghost"

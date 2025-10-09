@@ -1,13 +1,18 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import MoodTiles from "@/components/MoodTiles";
 import PlaylistView from "@/components/PlaylistView";
 import MusicPlayer from "@/components/MusicPlayer";
 import FloatingParticles from "@/components/FloatingParticles";
 import { SearchBar } from "@/components/SearchBar";
 import { PlaylistManager } from "@/components/PlaylistManager";
+import { QueueManager } from "@/components/QueueManager";
+import { FavoritesView } from "@/components/FavoritesView";
+import { HistoryView } from "@/components/HistoryView";
+import { DiscoverView } from "@/components/DiscoverView";
 import { useMusicPlayer } from "@/hooks/useMusicPlayer";
 import { Button } from "@/components/ui/button";
-import { Search, Music, Home } from "lucide-react";
+import { Search, Music, Home, ListMusic, Heart, Clock, Sparkles, Upload, Download } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 interface Mood {
   id: string;
@@ -20,7 +25,8 @@ interface Mood {
 const Index = () => {
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
   const [showPlaylist, setShowPlaylist] = useState(false);
-  const [currentView, setCurrentView] = useState<'moods' | 'search' | 'playlists'>('moods');
+  const [currentView, setCurrentView] = useState<'moods' | 'search' | 'playlists' | 'queue' | 'favorites' | 'history' | 'discover'>('moods');
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const {
     currentTrack,
@@ -31,6 +37,11 @@ const Index = () => {
     queue,
     currentTrackIndex,
     playlists,
+    favorites,
+    history,
+    recentlyPlayed,
+    shuffle,
+    repeat,
     playTrack,
     playPlaylist,
     loadMoodPlaylist,
@@ -39,12 +50,22 @@ const Index = () => {
     playPrevious,
     seekTo,
     setVolume,
+    toggleShuffle,
+    toggleRepeat,
+    toggleFavorite,
+    isFavorite,
     createPlaylist,
     deletePlaylist,
     renamePlaylist,
     addToPlaylist,
     removeFromPlaylist,
     playFromPlaylist,
+    exportPlaylist,
+    importPlaylist,
+    clearHistory,
+    addToQueue,
+    removeFromQueue,
+    clearQueue,
   } = useMusicPlayer();
 
   const handleMoodSelect = async (mood: Mood) => {
@@ -69,6 +90,17 @@ const Index = () => {
     }
   };
 
+  const handleImportPlaylist = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      importPlaylist(file);
+    }
+  };
+
   const renderContent = () => {
     if (currentView === 'search') {
       return (
@@ -81,14 +113,73 @@ const Index = () => {
     
     if (currentView === 'playlists') {
       return (
-        <PlaylistManager
-          playlists={playlists}
-          onCreatePlaylist={createPlaylist}
-          onDeletePlaylist={deletePlaylist}
-          onRenamePlaylist={renamePlaylist}
-          onRemoveFromPlaylist={removeFromPlaylist}
-          onPlayPlaylist={playFromPlaylist}
+        <div className="space-y-4">
+          <div className="flex gap-2 justify-end">
+            <Button onClick={handleImportPlaylist} variant="outline" className="glass-button">
+              <Upload className="h-4 w-4 mr-2" />
+              Import
+            </Button>
+          </div>
+          <PlaylistManager
+            playlists={playlists}
+            onCreatePlaylist={createPlaylist}
+            onDeletePlaylist={deletePlaylist}
+            onRenamePlaylist={renamePlaylist}
+            onRemoveFromPlaylist={removeFromPlaylist}
+            onPlayPlaylist={playFromPlaylist}
+            onExportPlaylist={exportPlaylist}
+            currentTrack={currentTrack}
+          />
+        </div>
+      );
+    }
+
+    if (currentView === 'queue') {
+      return (
+        <QueueManager
+          queue={queue}
+          currentTrackIndex={currentTrackIndex}
+          onTrackSelect={(track, index) => {
+            playTrack(track, queue);
+          }}
+          onRemoveFromQueue={removeFromQueue}
+          onClearQueue={clearQueue}
+        />
+      );
+    }
+
+    if (currentView === 'favorites') {
+      return (
+        <FavoritesView
+          favorites={favorites}
           currentTrack={currentTrack}
+          isPlaying={isPlaying}
+          onTrackSelect={(track, tracks) => playTrack(track, tracks)}
+          onRemoveFavorite={toggleFavorite}
+          onPlayAll={() => playPlaylist(favorites)}
+        />
+      );
+    }
+
+    if (currentView === 'history') {
+      return (
+        <HistoryView
+          history={history}
+          onTrackSelect={handleTrackSelect}
+          onClearHistory={clearHistory}
+        />
+      );
+    }
+
+    if (currentView === 'discover') {
+      return (
+        <DiscoverView
+          recentlyPlayed={recentlyPlayed}
+          favorites={favorites}
+          onTrackSelect={(track, tracks) => playTrack(track, tracks)}
+          onToggleFavorite={toggleFavorite}
+          onAddToQueue={addToQueue}
+          isFavorite={isFavorite}
         />
       );
     }
@@ -131,7 +222,7 @@ const Index = () => {
             </p>
             
             {/* Navigation */}
-            <div className="flex justify-center gap-4 mb-8">
+            <div className="flex flex-wrap justify-center gap-3 mb-8">
               <Button
                 variant={currentView === 'moods' ? 'default' : 'outline'}
                 onClick={() => {
@@ -139,28 +230,67 @@ const Index = () => {
                   setShowPlaylist(false);
                   setSelectedMood(null);
                 }}
-                className="flex items-center gap-2"
+                className="glass-button"
               >
-                <Home className="h-4 w-4" />
+                <Home className="h-4 w-4 mr-2" />
                 Moods
               </Button>
               <Button
                 variant={currentView === 'search' ? 'default' : 'outline'}
                 onClick={() => setCurrentView('search')}
-                className="flex items-center gap-2"
+                className="glass-button"
               >
-                <Search className="h-4 w-4" />
+                <Search className="h-4 w-4 mr-2" />
                 Search
               </Button>
               <Button
                 variant={currentView === 'playlists' ? 'default' : 'outline'}
                 onClick={() => setCurrentView('playlists')}
-                className="flex items-center gap-2"
+                className="glass-button"
               >
-                <Music className="h-4 w-4" />
+                <Music className="h-4 w-4 mr-2" />
                 Playlists ({playlists.length})
               </Button>
+              <Button
+                variant={currentView === 'queue' ? 'default' : 'outline'}
+                onClick={() => setCurrentView('queue')}
+                className="glass-button"
+              >
+                <ListMusic className="h-4 w-4 mr-2" />
+                Queue ({queue.length})
+              </Button>
+              <Button
+                variant={currentView === 'favorites' ? 'default' : 'outline'}
+                onClick={() => setCurrentView('favorites')}
+                className="glass-button"
+              >
+                <Heart className="h-4 w-4 mr-2" />
+                Favorites ({favorites.length})
+              </Button>
+              <Button
+                variant={currentView === 'history' ? 'default' : 'outline'}
+                onClick={() => setCurrentView('history')}
+                className="glass-button"
+              >
+                <Clock className="h-4 w-4 mr-2" />
+                History
+              </Button>
+              <Button
+                variant={currentView === 'discover' ? 'default' : 'outline'}
+                onClick={() => setCurrentView('discover')}
+                className="glass-button"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Discover
+              </Button>
             </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              onChange={handleFileChange}
+              className="hidden"
+            />
           </header>
 
           {renderContent()}
@@ -173,11 +303,17 @@ const Index = () => {
         isPlaying={isPlaying}
         currentTime={currentTime}
         volume={volume}
+        shuffle={shuffle}
+        repeat={repeat}
+        isFavorite={currentTrack ? isFavorite(currentTrack.id) : false}
         onPlayPause={togglePlayPause}
         onNext={playNext}
         onPrevious={playPrevious}
         onSeek={seekTo}
         onVolumeChange={setVolume}
+        onToggleShuffle={toggleShuffle}
+        onToggleRepeat={toggleRepeat}
+        onToggleFavorite={() => currentTrack && toggleFavorite(currentTrack)}
       />
     </div>
   );
