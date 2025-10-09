@@ -2,12 +2,12 @@ import { useState } from "react";
 import MoodTiles from "@/components/MoodTiles";
 import PlaylistView from "@/components/PlaylistView";
 import MusicPlayer from "@/components/MusicPlayer";
-import AnimeBackground from "@/components/AnimeBackground";
-import FloatingElements from "@/components/FloatingElements";
+import FloatingParticles from "@/components/FloatingParticles";
 import { SearchBar } from "@/components/SearchBar";
 import { PlaylistManager } from "@/components/PlaylistManager";
 import { useMusicPlayer } from "@/hooks/useMusicPlayer";
-import { Music2, Search, ListMusic } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Search, Music, Home } from "lucide-react";
 
 interface Mood {
   id: string;
@@ -117,77 +117,54 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      {/* Anime Background Layer */}
-      <AnimeBackground />
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      <FloatingParticles />
       
-      {/* Floating Elements (particles, stars, petals) */}
-      <FloatingElements />
-      
-      <div className="container mx-auto px-4 py-8 pb-32 relative z-20">
-        {/* Header */}
-        <header className="text-center mb-12 fade-in-up">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <svg className="w-6 h-6 text-accent animate-pulse" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7.4-6.3-4.6-6.3 4.6 2.3-7.4-6-4.6h7.6z"/>
-            </svg>
-            <h1 className="text-6xl font-rounded font-bold logo-gradient breathe">
+      <div className="relative z-10 p-8">
+        <div className="max-w-6xl mx-auto">
+          <header className="text-center mb-8">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 bg-gradient-to-r from-pink-400 to-violet-400 bg-clip-text text-transparent">
               MoodiFy KP
             </h1>
-            <svg className="w-6 h-6 text-accent animate-pulse" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2l2.4 7.4h7.6l-6 4.6 2.3 7.4-6.3-4.6-6.3 4.6 2.3-7.4-6-4.6h7.6z"/>
-            </svg>
-          </div>
-          <p className="text-sm font-japanese opacity-70 mb-4 tracking-wider" style={{ textShadow: '0 0 10px rgba(255,255,255,0.5)' }}>
-            ムーディファイ
-          </p>
-          <p className="text-white/85 text-lg pulse-glow" style={{ textShadow: '0 0 15px rgba(255,255,255,0.6)' }}>
-            Your personal music sanctuary ✨
-          </p>
-        </header>
-        
-        {/* Navigation */}
-        <nav className="flex justify-center gap-6 mb-10 flex-wrap">
-          <button
-            onClick={() => {
-              setCurrentView('moods');
-              setShowPlaylist(false);
-              setSelectedMood(null);
-            }}
-            className={`glass-button flex items-center gap-3 px-8 py-4 font-medium transition-all ${
-              currentView === 'moods'
-                ? "ring-2 ring-primary shadow-lg shadow-primary/50"
-                : ""
-            }`}
-          >
-            <Music2 className="w-5 h-5" style={{ filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.5))' }} />
-            <span>Moods</span>
-          </button>
-          <button
-            onClick={() => setCurrentView('search')}
-            className={`glass-button flex items-center gap-3 px-8 py-4 font-medium transition-all ${
-              currentView === 'search'
-                ? "ring-2 ring-primary shadow-lg shadow-primary/50"
-                : ""
-            }`}
-          >
-            <Search className="w-5 h-5" style={{ filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.5))' }} />
-            <span>Search</span>
-          </button>
-          <button
-            onClick={() => setCurrentView('playlists')}
-            className={`glass-button flex items-center gap-3 px-8 py-4 font-medium transition-all ${
-              currentView === 'playlists'
-                ? "ring-2 ring-primary shadow-lg shadow-primary/50"
-                : ""
-            }`}
-          >
-            <ListMusic className="w-5 h-5" style={{ filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.5))' }} />
-            <span>Playlists ({playlists.length})</span>
-          </button>
-        </nav>
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto mb-6">
+              Experience music through your emotions. Choose your current mood and let us curate the perfect soundtrack for your soul.
+            </p>
+            
+            {/* Navigation */}
+            <div className="flex justify-center gap-4 mb-8">
+              <Button
+                variant={currentView === 'moods' ? 'default' : 'outline'}
+                onClick={() => {
+                  setCurrentView('moods');
+                  setShowPlaylist(false);
+                  setSelectedMood(null);
+                }}
+                className="flex items-center gap-2"
+              >
+                <Home className="h-4 w-4" />
+                Moods
+              </Button>
+              <Button
+                variant={currentView === 'search' ? 'default' : 'outline'}
+                onClick={() => setCurrentView('search')}
+                className="flex items-center gap-2"
+              >
+                <Search className="h-4 w-4" />
+                Search
+              </Button>
+              <Button
+                variant={currentView === 'playlists' ? 'default' : 'outline'}
+                onClick={() => setCurrentView('playlists')}
+                className="flex items-center gap-2"
+              >
+                <Music className="h-4 w-4" />
+                Playlists ({playlists.length})
+              </Button>
+            </div>
+          </header>
 
-        {renderContent()}
+          {renderContent()}
+        </div>
       </div>
 
       {/* Music Player */}

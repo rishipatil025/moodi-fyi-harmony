@@ -17,8 +17,10 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        "background-secondary": "hsl(var(--background-secondary))",
+        background: {
+          DEFAULT: "hsl(var(--background))",
+          secondary: "hsl(var(--background-secondary))",
+        },
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
@@ -28,17 +30,21 @@ export default {
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
+          glow: "hsl(var(--secondary-glow))",
         },
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
+          glow: "hsl(var(--accent-glow))",
         },
-        "mood-chill": "hsl(var(--mood-chill))",
-        "mood-melancholy": "hsl(var(--mood-melancholy))",
-        "mood-workout": "hsl(var(--mood-workout))",
-        "mood-focus": "hsl(var(--mood-focus))",
-        "mood-love": "hsl(var(--mood-love))",
-        "mood-party": "hsl(var(--mood-party))",
+        mood: {
+          chill: "hsl(var(--mood-chill))",
+          melancholy: "hsl(var(--mood-melancholy))",
+          workout: "hsl(var(--mood-workout))",
+          focus: "hsl(var(--mood-focus))",
+          love: "hsl(var(--mood-love))",
+          party: "hsl(var(--mood-party))",
+        },
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",
@@ -46,11 +52,23 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+          glass: "hsl(var(--card-glass))",
         },
       },
+      backgroundImage: {
+        'gradient-primary': 'var(--gradient-primary)',
+        'gradient-secondary': 'var(--gradient-secondary)',
+        'gradient-accent': 'var(--gradient-accent)',
+        'gradient-bg': 'var(--gradient-bg)',
+      },
+      boxShadow: {
+        'primary': 'var(--shadow-primary)',
+        'secondary': 'var(--shadow-secondary)',
+        'accent': 'var(--shadow-accent)',
+        'elegant': 'var(--shadow-elegant)',
+      },
       fontFamily: {
-        rounded: ['"M PLUS Rounded 1c"', '"Nunito"', 'sans-serif'],
-        japanese: ['"Noto Sans JP"', 'sans-serif'],
+        'japanese': ['Noto Sans JP', 'Inter', 'sans-serif'],
       },
       transitionTimingFunction: {
         'smooth': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)',

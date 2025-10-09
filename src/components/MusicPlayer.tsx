@@ -64,8 +64,8 @@ const MusicPlayer = ({
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 player-glass z-50">
-      <div className="container mx-auto px-6 py-5 flex items-center gap-6">
+    <div className="fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-white/10 p-4">
+      <div className="max-w-7xl mx-auto flex items-center gap-4">
         {/* Current Track Info */}
         <div className="flex items-center gap-3 min-w-0 flex-1 max-w-xs">
           <div className="relative group">
@@ -121,16 +121,16 @@ const MusicPlayer = ({
               <SkipBack className="w-5 h-5" />
             </Button>
             
-            <button
+            <Button
               onClick={onPlayPause}
-              className="control-button w-16 h-16 rounded-full flex items-center justify-center shadow-xl"
+              className="w-12 h-12 rounded-full bg-gradient-primary shadow-primary hover:shadow-lg transition-all duration-300 hover:scale-105"
             >
               {isPlaying ? (
-                <Pause className="w-7 h-7 text-white" style={{ filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.6))' }} />
+                <Pause className="w-5 h-5 text-background" />
               ) : (
-                <Play className="w-7 h-7 text-white ml-1" style={{ filter: 'drop-shadow(0 0 6px rgba(255,255,255,0.6))' }} />
+                <Play className="w-5 h-5 text-background ml-0.5" />
               )}
-            </button>
+            </Button>
             
             <Button
               variant="ghost"
@@ -162,28 +162,21 @@ const MusicPlayer = ({
           
           {/* Progress Bar */}
           <div className="flex items-center gap-3 w-full max-w-md">
-            <span className="text-xs text-white/60 font-mono">
+            <span className="text-xs text-muted-foreground font-mono">
               {formatTime(currentTime)}
             </span>
             
-            <div className="flex-1 relative">
-              <div className="progress-track h-2 rounded-full overflow-hidden">
-                <div 
-                  className="progress-fill h-full transition-all duration-100"
-                  style={{ width: `${(currentTime / currentTrack.duration) * 100}%` }}
-                />
-              </div>
-              <input
-                type="range"
-                min="0"
+            <div className="flex-1">
+              <Slider
+                value={[currentTime]}
                 max={currentTrack.duration}
-                value={currentTime}
-                onChange={(e) => onSeek(Number(e.target.value))}
-                className="absolute inset-0 w-full h-2 opacity-0 cursor-pointer"
+                step={1}
+                onValueChange={([value]) => onSeek(value)}
+                className="w-full"
               />
             </div>
             
-            <span className="text-xs text-white/60 font-mono">
+            <span className="text-xs text-muted-foreground font-mono">
               {formatTime(currentTrack.duration)}
             </span>
           </div>
@@ -197,22 +190,15 @@ const MusicPlayer = ({
           </div>
           
           {/* Volume Control */}
-          <div className="flex items-center gap-3">
-            <Volume2 className="w-5 h-5 text-white/70 hover:text-white transition-colors" style={{ filter: 'drop-shadow(0 0 4px rgba(255,255,255,0.3))' }} />
-            <div className="relative w-28">
-              <div className="progress-track h-1.5 rounded-full overflow-hidden">
-                <div 
-                  className="progress-fill h-full"
-                  style={{ width: `${volume}%` }}
-                />
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={volume}
-                onChange={(e) => onVolumeChange(Number(e.target.value))}
-                className="absolute inset-0 w-full h-1.5 opacity-0 cursor-pointer"
+          <div className="flex items-center gap-2">
+            <Volume2 className="w-4 h-4 text-muted-foreground" />
+            <div className="w-20">
+              <Slider
+                value={[volume]}
+                max={100}
+                step={1}
+                onValueChange={([value]) => onVolumeChange(value)}
+                className="w-full"
               />
             </div>
           </div>

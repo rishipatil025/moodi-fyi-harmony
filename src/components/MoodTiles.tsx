@@ -76,66 +76,90 @@ const MoodTiles = ({ onMoodSelect }: MoodTilesProps) => {
   const [hoveredMood, setHoveredMood] = useState<string | null>(null);
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="text-center mb-12">
-        <h2 className="text-4xl font-rounded font-bold mb-4 pulse-glow">
-          What's your mood today, KP? ✨
-        </h2>
-        <p className="text-white/65 text-lg italic" style={{ textShadow: '0 0 8px rgba(255,255,255,0.3)' }}>
-          Choose a vibe and let the music take you there
+    <div className="w-full max-w-6xl mx-auto px-4">
+      <div className="text-center mb-12 fade-in-up">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-light mb-4 font-japanese bg-gradient-primary bg-clip-text text-transparent">
+          What's your mood today, KP?
+        </h1>
+        <p className="text-lg text-muted-foreground font-light">
+          Select a vibe and let the music flow through your soul
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {moods.map((mood) => {
-          const moodClass = `mood-${mood.id}`;
-          
-          return (
-            <div
-              key={mood.id}
-              onClick={() => onMoodSelect(mood)}
-              onMouseEnter={() => setHoveredMood(mood.id)}
-              onMouseLeave={() => setHoveredMood(null)}
-              className={`mood-tile ${moodClass} group relative h-72 cursor-pointer`}
-            >
-              {/* Background Image */}
-              <div 
-                className="mood-bg-image absolute inset-0 bg-cover bg-center transition-transform duration-700"
-                style={{ 
-                  backgroundImage: `url(${mood.bgImage})`,
-                }}
-              />
-              
-              {/* Gradient Overlay */}
-              <div 
-                className="absolute inset-0 transition-opacity duration-300"
-                style={{
-                  background: `linear-gradient(135deg, hsl(var(--${mood.color})) / 0.5, hsl(var(--${mood.color})) / 0.2)`,
-                  opacity: hoveredMood === mood.id ? 0.9 : 0.6
-                }}
-              />
-              
-              {/* Content */}
-              <div className="relative h-full p-8 flex flex-col justify-between z-10">
-                <div className="mood-emoji text-7xl transition-transform duration-300" style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+        {moods.map((mood, index) => (
+          <div
+            key={mood.id}
+            className={`mood-tile relative h-48 md:h-56 lg:h-64 rounded-2xl cursor-pointer transition-all duration-500 fade-in-up group ${
+              hoveredMood === mood.id ? 'scale-105' : ''
+            }`}
+            style={{
+              backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5)), url(${mood.bgImage})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              animationDelay: `${index * 0.1}s`,
+            }}
+            onClick={() => onMoodSelect(mood)}
+            onMouseEnter={() => setHoveredMood(mood.id)}
+            onMouseLeave={() => setHoveredMood(null)}
+          >
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent rounded-2xl" />
+            
+            {/* Glow Effect */}
+            <div 
+              className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-20 transition-opacity duration-500`}
+              style={{
+                background: `radial-gradient(circle at center, hsl(var(--${mood.color})) 0%, transparent 70%)`,
+              }}
+            />
+
+            {/* Content */}
+            <div className="absolute inset-0 flex flex-col justify-between p-6 z-10">
+              {/* Emoji */}
+              <div className="self-end">
+                <span className="text-4xl md:text-5xl opacity-80 group-hover:opacity-100 transition-all duration-300 group-hover:scale-110">
                   {mood.emoji}
-                </div>
-                
-                <div>
-                  <h3 className="text-3xl font-rounded font-bold mb-2 text-white" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3)' }}>
-                    {mood.name}
-                  </h3>
-                  <p className="text-white/95 text-sm leading-relaxed" style={{ textShadow: '0 1px 4px rgba(0,0,0,0.6)' }}>
-                    {mood.description}
-                  </p>
-                </div>
+                </span>
               </div>
 
-              {/* Inner Light Reflection */}
-              <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white/10 to-transparent pointer-events-none" />
+              {/* Mood Info */}
+              <div className="space-y-2">
+                <h3 className="text-2xl md:text-3xl font-medium text-white font-japanese group-hover:text-white transition-colors">
+                  {mood.name}
+                </h3>
+                <p className="text-white/70 text-sm md:text-base font-light group-hover:text-white/90 transition-colors">
+                  {mood.description}
+                </p>
+              </div>
             </div>
-          );
-        })}
+
+            {/* Hover Particle Effect */}
+            {hoveredMood === mood.id && (
+              <div className="absolute inset-0 pointer-events-none">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="absolute w-1 h-1 rounded-full opacity-60 animate-ping"
+                    style={{
+                      backgroundColor: `hsl(var(--${mood.color}))`,
+                      left: `${20 + Math.random() * 60}%`,
+                      top: `${20 + Math.random() * 60}%`,
+                      animationDelay: `${i * 0.2}s`,
+                      animationDuration: '2s',
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="text-center mt-12 fade-in-up" style={{ animationDelay: '0.6s' }}>
+        <p className="text-sm text-muted-foreground/60 font-light">
+          Each mood brings a unique sonic journey crafted just for you
+        </p>
       </div>
     </div>
   );
