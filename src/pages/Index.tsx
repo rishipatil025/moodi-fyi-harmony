@@ -9,9 +9,11 @@ import { QueueManager } from "@/components/QueueManager";
 import { FavoritesView } from "@/components/FavoritesView";
 import { HistoryView } from "@/components/HistoryView";
 import { DiscoverView } from "@/components/DiscoverView";
+import { ListenTogetherDialog } from "@/components/ListenTogetherDialog";
 import { useMusicPlayer } from "@/hooks/useMusicPlayer";
+import { useListenTogether } from "@/hooks/useListenTogether";
 import { Button } from "@/components/ui/button";
-import { Search, Music, Home, ListMusic, Heart, Clock, Sparkles, Upload, Download } from "lucide-react";
+import { Search, Music, Home, ListMusic, Heart, Clock, Sparkles, Upload, Download, Users } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface Mood {
@@ -26,7 +28,9 @@ const Index = () => {
   const [selectedMood, setSelectedMood] = useState<Mood | null>(null);
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [currentView, setCurrentView] = useState<'moods' | 'search' | 'playlists' | 'queue' | 'favorites' | 'history' | 'discover'>('moods');
+  const [listenTogetherOpen, setListenTogetherOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
   
   const {
     currentTrack,
@@ -67,6 +71,75 @@ const Index = () => {
     removeFromQueue,
     clearQueue,
   } = useMusicPlayer();
+
+  const handleRemoteControl = (action: string, data?: any) => {
+    switch (action) {
+      case 'play':
+        if (data) playTrack(data.track, data.queue);
+        break;
+      case 'pause':
+        togglePlayPause();
+        break;
+      case 'next':
+        playNext();
+        break;
+      case 'previous':
+        playPrevious();
+        break;
+      case 'seek':
+        if (data?.time !== undefined) seekTo(data.time);
+        break;
+      case 'volume':
+        if (data?.volume !== undefined) setVolume(data.volume);
+        break;
+    }
+  };
+
+  const {
+    state: listenTogetherState,
+    createRoom,
+    joinRoom,
+    sendControl,
+    disconnect,
+  } = useListenTogether(handleRemoteControl);
+
+  const handlePlayPauseWithSync = () => {
+    togglePlayPause();
+    if (listenTogetherState.isHost && listenTogetherState.isConnected) {
+      sendControl(isPlaying ? 'pause' : 'play', { 
+        track: currentTrack, 
+        queue 
+      });
+    }
+  };
+
+  const handleNextWithSync = () => {
+    playNext();
+    if (listenTogetherState.isHost && listenTogetherState.isConnected) {
+      sendControl('next');
+    }
+  };
+
+  const handlePreviousWithSync = () => {
+    playPrevious();
+    if (listenTogetherState.isHost && listenTogetherState.isConnected) {
+      sendControl('previous');
+    }
+  };
+
+  const handleSeekWithSync = (time: number) => {
+    seekTo(time);
+    if (listenTogetherState.isHost && listenTogetherState.isConnected) {
+      sendControl('seek', { time });
+    }
+  };
+
+  const handleVolumeWithSync = (vol: number) => {
+    setVolume(vol);
+    if (listenTogetherState.isHost && listenTogetherState.isConnected) {
+      sendControl('volume', { volume: vol });
+    }
+  };
 
   const handleMoodSelect = async (mood: Mood) => {
     setSelectedMood(mood);
@@ -283,6 +356,17 @@ const Index = () => {
                 <Sparkles className="h-4 w-4 mr-2" />
                 Discover
               </Button>
+              <Button
+                variant={listenTogetherState.isConnected ? 'default' : 'outline'}
+                onClick={() => setListenTogetherOpen(true)}
+                className="glass-button"
+              >
+                <Users className="h-4 w-4 mr-2" />
+                Listen Together
+                {listenTogetherState.isConnected && (
+                  <span className="ml-2 w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                )}
+              </Button>
             </div>
             <input
               ref={fileInputRef}
@@ -306,14 +390,25 @@ const Index = () => {
         shuffle={shuffle}
         repeat={repeat}
         isFavorite={currentTrack ? isFavorite(currentTrack.id) : false}
-        onPlayPause={togglePlayPause}
-        onNext={playNext}
-        onPrevious={playPrevious}
-        onSeek={seekTo}
-        onVolumeChange={setVolume}
+        onPlayPause={handlePlayPauseWithSync}
+        onNext={handleNextWithSync}
+        onPrevious={handlePreviousWithSync}
+        onSeek={handleSeekWithSync}
+        onVolumeChange={handleVolumeWithSync}
         onToggleShuffle={toggleShuffle}
         onToggleRepeat={toggleRepeat}
         onToggleFavorite={() => currentTrack && toggleFavorite(currentTrack)}
+      />
+
+      <ListenTogetherDialog
+        open={listenTogetherOpen}
+        onOpenChange={setListenTogetherOpen}
+        onCreateRoom={createRoom}
+        onJoinRoom={joinRoom}
+        roomCode={listenTogetherState.roomCode}
+        isConnected={listenTogetherState.isConnected}
+        connectedUser={listenTogetherState.connectedUser}
+        onDisconnect={disconnect}
       />
     </div>
   );
