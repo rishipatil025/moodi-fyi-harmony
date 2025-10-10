@@ -100,6 +100,7 @@ const Index = () => {
     createRoom,
     joinRoom,
     sendControl,
+    sendMessage,
     disconnect,
   } = useListenTogether(handleRemoteControl);
 
@@ -409,6 +410,8 @@ const Index = () => {
         isConnected={listenTogetherState.isConnected}
         connectedUser={listenTogetherState.connectedUser}
         onDisconnect={disconnect}
+        messages={listenTogetherState.messages}
+        onSendMessage={sendMessage}
       />
     </div>
   );

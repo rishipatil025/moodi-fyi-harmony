@@ -1,12 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
 import Peer, { DataConnection } from 'peerjs';
 
+export interface ChatMessage {
+  id: string;
+  message: string;
+  timestamp: Date;
+  isOwn: boolean;
+}
+
 export interface ListenTogetherState {
   isHost: boolean;
   isConnected: boolean;
   roomCode: string | null;
   connectedUser: string | null;
   peer: Peer | null;
+  messages: ChatMessage[];
 }
 
 export const useListenTogether = (
@@ -18,6 +26,7 @@ export const useListenTogether = (
     roomCode: null,
     connectedUser: null,
     peer: null,
+    messages: [],
   });
 
   const connectionRef = useRef<DataConnection | null>(null);
@@ -68,6 +77,17 @@ export const useListenTogether = (
 
       conn.on('data', (data: any) => {
         console.log('Host received:', data);
+        if (data.type === 'chat') {
+          setState(prev => ({
+            ...prev,
+            messages: [...prev.messages, {
+              id: Date.now().toString(),
+              message: data.message,
+              timestamp: new Date(),
+              isOwn: false,
+            }],
+          }));
+        }
       });
     });
 
@@ -100,6 +120,17 @@ export const useListenTogether = (
         if (data.action) {
           onRemoteControl(data.action, data.data);
         }
+        if (data.type === 'chat') {
+          setState(prev => ({
+            ...prev,
+            messages: [...prev.messages, {
+              id: Date.now().toString(),
+              message: data.message,
+              timestamp: new Date(),
+              isOwn: false,
+            }],
+          }));
+        }
       });
 
       conn.on('close', () => {
@@ -122,6 +153,21 @@ export const useListenTogether = (
     }
   };
 
+  const sendMessage = (message: string) => {
+    if (connectionRef.current) {
+      connectionRef.current.send({ type: 'chat', message });
+      setState(prev => ({
+        ...prev,
+        messages: [...prev.messages, {
+          id: Date.now().toString(),
+          message,
+          timestamp: new Date(),
+          isOwn: true,
+        }],
+      }));
+    }
+  };
+
   const disconnect = () => {
     if (connectionRef.current) {
       connectionRef.current.close();
@@ -135,6 +181,7 @@ export const useListenTogether = (
       roomCode: null,
       connectedUser: null,
       peer: null,
+      messages: [],
     });
   };
 
@@ -143,6 +190,7 @@ export const useListenTogether = (
     createRoom,
     joinRoom,
     sendControl,
+    sendMessage,
     disconnect,
   };
 };
