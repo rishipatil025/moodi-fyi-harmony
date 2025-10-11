@@ -43,6 +43,15 @@ export const ListenTogetherDialog = ({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  useEffect(() => {
+    if (isConnected) {
+      toast({
+        title: 'Connected!',
+        description: 'You are now listening together',
+      });
+    }
+  }, [isConnected, toast]);
+
   const handleCopyCode = () => {
     if (roomCode) {
       navigator.clipboard.writeText(roomCode);
@@ -57,7 +66,17 @@ export const ListenTogetherDialog = ({
 
   const handleJoin = () => {
     if (joinCode.trim()) {
+      toast({
+        title: 'Connecting...',
+        description: 'Attempting to join the room',
+      });
       onJoinRoom(joinCode.trim());
+    } else {
+      toast({
+        title: 'Invalid room code',
+        description: 'Please enter a valid room code',
+        variant: 'destructive',
+      });
     }
   };
 

@@ -44,127 +44,196 @@ export const useListenTogether = (
   }, []);
 
   const createRoom = () => {
-    const peer = new Peer();
-    peerRef.current = peer;
-
-    peer.on('open', (id) => {
-      setState(prev => ({
-        ...prev,
-        isHost: true,
-        roomCode: id,
-        peer,
-      }));
-    });
-
-    peer.on('connection', (conn) => {
-      connectionRef.current = conn;
-      
-      conn.on('open', () => {
-        setState(prev => ({
-          ...prev,
-          isConnected: true,
-          connectedUser: conn.peer,
-        }));
-      });
-
-      conn.on('close', () => {
-        setState(prev => ({
-          ...prev,
-          isConnected: false,
-          connectedUser: null,
-        }));
-      });
-
-      conn.on('data', (data: any) => {
-        console.log('Host received:', data);
-        if (data.type === 'chat') {
-          setState(prev => ({
-            ...prev,
-            messages: [...prev.messages, {
-              id: Date.now().toString(),
-              message: data.message,
-              timestamp: new Date(),
-              isOwn: false,
-            }],
-          }));
+    try {
+      const peer = new Peer({
+        debug: 2,
+        config: {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+          ]
         }
       });
-    });
+      peerRef.current = peer;
 
-    peer.on('error', (err) => {
-      console.error('Peer error:', err);
-    });
-  };
-
-  const joinRoom = (roomCode: string) => {
-    const peer = new Peer();
-    peerRef.current = peer;
-
-    peer.on('open', () => {
-      const conn = peer.connect(roomCode);
-      connectionRef.current = conn;
-
-      conn.on('open', () => {
+      peer.on('open', (id) => {
+        console.log('Room created with ID:', id);
         setState(prev => ({
           ...prev,
-          isHost: false,
-          isConnected: true,
-          roomCode,
-          connectedUser: roomCode,
+          isHost: true,
+          roomCode: id,
           peer,
         }));
       });
 
-      conn.on('data', (data: any) => {
-        console.log('Guest received:', data);
-        if (data.action) {
-          onRemoteControl(data.action, data.data);
-        }
-        if (data.type === 'chat') {
+      peer.on('connection', (conn) => {
+        console.log('Guest connected:', conn.peer);
+        connectionRef.current = conn;
+        
+        conn.on('open', () => {
+          console.log('Connection established with guest');
           setState(prev => ({
             ...prev,
-            messages: [...prev.messages, {
-              id: Date.now().toString(),
-              message: data.message,
-              timestamp: new Date(),
-              isOwn: false,
-            }],
+            isConnected: true,
+            connectedUser: conn.peer,
           }));
+        });
+
+        conn.on('close', () => {
+          console.log('Guest disconnected');
+          setState(prev => ({
+            ...prev,
+            isConnected: false,
+            connectedUser: null,
+          }));
+        });
+
+        conn.on('data', (data: any) => {
+          console.log('Host received:', data);
+          if (data.type === 'chat') {
+            setState(prev => ({
+              ...prev,
+              messages: [...prev.messages, {
+                id: Date.now().toString(),
+                message: data.message,
+                timestamp: new Date(),
+                isOwn: false,
+              }],
+            }));
+          }
+        });
+
+        conn.on('error', (err) => {
+          console.error('Connection error:', err);
+        });
+      });
+
+      peer.on('error', (err) => {
+        console.error('Peer error:', err.type, err);
+        if (err.type === 'peer-unavailable') {
+          alert('Could not connect to peer. Please check the room code.');
         }
       });
 
-      conn.on('close', () => {
-        setState(prev => ({
-          ...prev,
-          isConnected: false,
-          connectedUser: null,
-        }));
+      peer.on('disconnected', () => {
+        console.log('Peer disconnected, attempting to reconnect...');
+        peer.reconnect();
       });
-    });
+    } catch (err) {
+      console.error('Failed to create room:', err);
+    }
+  };
 
-    peer.on('error', (err) => {
-      console.error('Peer error:', err);
-    });
+  const joinRoom = (roomCode: string) => {
+    try {
+      const peer = new Peer({
+        debug: 2,
+        config: {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:stun1.l.google.com:19302' },
+          ]
+        }
+      });
+      peerRef.current = peer;
+
+      peer.on('open', (id) => {
+        console.log('Guest peer opened, connecting to room:', roomCode);
+        const conn = peer.connect(roomCode, {
+          reliable: true,
+        });
+        connectionRef.current = conn;
+
+        conn.on('open', () => {
+          console.log('Successfully connected to host');
+          setState(prev => ({
+            ...prev,
+            isHost: false,
+            isConnected: true,
+            roomCode,
+            connectedUser: roomCode,
+            peer,
+          }));
+        });
+
+        conn.on('data', (data: any) => {
+          console.log('Guest received:', data);
+          if (data.action) {
+            onRemoteControl(data.action, data.data);
+          }
+          if (data.type === 'chat') {
+            setState(prev => ({
+              ...prev,
+              messages: [...prev.messages, {
+                id: Date.now().toString(),
+                message: data.message,
+                timestamp: new Date(),
+                isOwn: false,
+              }],
+            }));
+          }
+        });
+
+        conn.on('close', () => {
+          console.log('Connection closed');
+          setState(prev => ({
+            ...prev,
+            isConnected: false,
+            connectedUser: null,
+          }));
+        });
+
+        conn.on('error', (err) => {
+          console.error('Connection error:', err);
+        });
+      });
+
+      peer.on('error', (err) => {
+        console.error('Peer error:', err.type, err);
+        if (err.type === 'peer-unavailable') {
+          alert('Room not found. Please check the room code and try again.');
+        } else if (err.type === 'network') {
+          alert('Network error. Please check your internet connection.');
+        }
+      });
+
+      peer.on('disconnected', () => {
+        console.log('Peer disconnected, attempting to reconnect...');
+        peer.reconnect();
+      });
+    } catch (err) {
+      console.error('Failed to join room:', err);
+    }
   };
 
   const sendControl = (action: string, data?: any) => {
-    if (connectionRef.current && state.isHost) {
-      connectionRef.current.send({ action, data });
+    if (connectionRef.current && state.isHost && connectionRef.current.open) {
+      console.log('Sending control:', action, data);
+      try {
+        connectionRef.current.send({ action, data });
+      } catch (err) {
+        console.error('Failed to send control:', err);
+      }
     }
   };
 
   const sendMessage = (message: string) => {
-    if (connectionRef.current) {
-      connectionRef.current.send({ type: 'chat', message });
-      setState(prev => ({
-        ...prev,
-        messages: [...prev.messages, {
-          id: Date.now().toString(),
-          message,
-          timestamp: new Date(),
-          isOwn: true,
-        }],
-      }));
+    if (connectionRef.current && connectionRef.current.open) {
+      console.log('Sending message:', message);
+      try {
+        connectionRef.current.send({ type: 'chat', message });
+        setState(prev => ({
+          ...prev,
+          messages: [...prev.messages, {
+            id: Date.now().toString(),
+            message,
+            timestamp: new Date(),
+            isOwn: true,
+          }],
+        }));
+      } catch (err) {
+        console.error('Failed to send message:', err);
+      }
     }
   };
 
