@@ -75,7 +75,11 @@ const Index = () => {
   const handleRemoteControl = (action: string, data?: any) => {
     switch (action) {
       case 'play':
-        if (data) playTrack(data.track, data.queue);
+        if (data) {
+          playTrack(data.track, data.queue);
+          if (typeof data.time === 'number') seekTo(data.time);
+          if (typeof data.volume === 'number') setVolume(data.volume);
+        }
         break;
       case 'pause':
         if (isPlaying) togglePlayPause();
@@ -104,23 +108,21 @@ const Index = () => {
     disconnect,
   } = useListenTogether(handleRemoteControl);
 
+  const lastSentTrackId = useRef<string | null>(null);
+
   const playTrackWithSync = (track: any, tracks?: any[]) => {
     playTrack(track, tracks ?? queue);
     if (listenTogetherState.isHost && listenTogetherState.isConnected) {
-      sendControl('play', { track, queue: tracks ?? queue });
+      sendControl('play', { track, queue: tracks ?? queue, time: 0, volume });
     }
   };
 
   useEffect(() => {
     if (listenTogetherState.isHost && listenTogetherState.isConnected && currentTrack) {
-      sendControl('play', { track: currentTrack, queue });
+      sendControl('play', { track: currentTrack, queue, time: currentTime, volume });
       if (!isPlaying) {
         sendControl('pause');
       }
-      if (currentTime > 0) {
-        sendControl('seek', { time: currentTime });
-      }
-      sendControl('volume', { volume });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [listenTogetherState.isConnected]);
@@ -130,7 +132,9 @@ const Index = () => {
     if (listenTogetherState.isHost && listenTogetherState.isConnected) {
       sendControl(isPlaying ? 'pause' : 'play', { 
         track: currentTrack, 
-        queue 
+        queue,
+        time: currentTime,
+        volume
       });
     }
   };
