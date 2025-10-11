@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import MoodTiles from "@/components/MoodTiles";
 import PlaylistView from "@/components/PlaylistView";
 import MusicPlayer from "@/components/MusicPlayer";
@@ -78,7 +78,7 @@ const Index = () => {
         if (data) playTrack(data.track, data.queue);
         break;
       case 'pause':
-        togglePlayPause();
+        if (isPlaying) togglePlayPause();
         break;
       case 'next':
         playNext();
@@ -103,6 +103,27 @@ const Index = () => {
     sendMessage,
     disconnect,
   } = useListenTogether(handleRemoteControl);
+
+  const playTrackWithSync = (track: any, tracks?: any[]) => {
+    playTrack(track, tracks ?? queue);
+    if (listenTogetherState.isHost && listenTogetherState.isConnected) {
+      sendControl('play', { track, queue: tracks ?? queue });
+    }
+  };
+
+  useEffect(() => {
+    if (listenTogetherState.isHost && listenTogetherState.isConnected && currentTrack) {
+      sendControl('play', { track: currentTrack, queue });
+      if (!isPlaying) {
+        sendControl('pause');
+      }
+      if (currentTime > 0) {
+        sendControl('seek', { time: currentTime });
+      }
+      sendControl('volume', { volume });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listenTogetherState.isConnected]);
 
   const handlePlayPauseWithSync = () => {
     togglePlayPause();
@@ -149,7 +170,7 @@ const Index = () => {
   };
 
   const handleTrackSelect = (track: any) => {
-    playTrack(track, [track]);
+    playTrackWithSync(track, [track]);
   };
 
   const handleAddToPlaylist = (track: any) => {
@@ -213,9 +234,9 @@ const Index = () => {
         <QueueManager
           queue={queue}
           currentTrackIndex={currentTrackIndex}
-          onTrackSelect={(track, index) => {
-            playTrack(track, queue);
-          }}
+            onTrackSelect={(track, index) => {
+              playTrackWithSync(track, queue);
+            }}
           onRemoveFromQueue={removeFromQueue}
           onClearQueue={clearQueue}
         />
@@ -228,9 +249,9 @@ const Index = () => {
           favorites={favorites}
           currentTrack={currentTrack}
           isPlaying={isPlaying}
-          onTrackSelect={(track, tracks) => playTrack(track, tracks)}
-          onRemoveFavorite={toggleFavorite}
-          onPlayAll={() => playPlaylist(favorites)}
+           onTrackSelect={(track, tracks) => playTrackWithSync(track, tracks)}
+           onRemoveFavorite={toggleFavorite}
+           onPlayAll={() => { playPlaylist(favorites); if (listenTogetherState.isHost && listenTogetherState.isConnected && favorites.length) { sendControl('play', { track: favorites[0], queue: favorites }); } }}
         />
       );
     }
@@ -250,8 +271,8 @@ const Index = () => {
         <DiscoverView
           recentlyPlayed={recentlyPlayed}
           favorites={favorites}
-          onTrackSelect={(track, tracks) => playTrack(track, tracks)}
-          onToggleFavorite={toggleFavorite}
+           onTrackSelect={(track, tracks) => playTrackWithSync(track, tracks)}
+           onToggleFavorite={toggleFavorite}
           onAddToQueue={addToQueue}
           isFavorite={isFavorite}
         />
@@ -272,7 +293,7 @@ const Index = () => {
           playlist={moodPlaylist}
           currentTrack={currentTrack}
           isPlaying={isPlaying}
-          onTrackSelect={(track, tracks) => playTrack(track, tracks)}
+          onTrackSelect={(track, tracks) => playTrackWithSync(track, tracks)}
           onPlayPause={togglePlayPause}
         />
       );
