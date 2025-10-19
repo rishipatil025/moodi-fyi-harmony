@@ -1,5 +1,5 @@
 // JioSaavn API integration with fallback sample tracks
-const JIOSAAVN_BASE_URL = 'https://saavn.dev/api';
+const JIOSAAVN_BASE_URL = 'https://saavn.sumit.co/api';
 const CORS_PROXY = 'https://corsproxy.io/?';
 
 export interface JioSaavnTrack {
