@@ -45,11 +45,28 @@ export const convertToTrack = (jiosaavnTrack: JioSaavnTrack) => ({
 export const searchSongs = async (query: string, limit: number = 10) => {
   try {
     const url = `${JIOSAAVN_BASE_URL}/search/songs?query=${encodeURIComponent(query)}&limit=${limit}`;
-    const response = await fetch(`${CORS_PROXY}${encodeURIComponent(url)}`);
-    if (!response.ok) throw new Error('Search failed');
-    
-    const data: SearchResult = await response.json();
-    return data.data.results.map(convertToTrack);
+    const attempts = [
+      url,
+      `https://cors.isomorphic-git.org/${url}`,
+      `${CORS_PROXY}${encodeURIComponent(url)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+      `https://thingproxy.freeboard.io/fetch/${url}`,
+    ];
+    let lastError: any = null;
+    for (const attemptUrl of attempts) {
+      try {
+        const response = await fetch(attemptUrl);
+        if (response.ok) {
+          const data: SearchResult = await response.json();
+          return data.data.results.map(convertToTrack);
+        }
+        lastError = new Error(`HTTP ${response.status}`);
+      } catch (e) {
+        lastError = e;
+      }
+    }
+    console.error('JioSaavn search error:', lastError);
+    return [];
   } catch (error) {
     console.error('JioSaavn search error:', error);
     return [];
@@ -60,11 +77,28 @@ export const searchSongs = async (query: string, limit: number = 10) => {
 export const getTrendingSongs = async (limit: number = 20) => {
   try {
     const url = `${JIOSAAVN_BASE_URL}/search/songs?query=trending&limit=${limit}`;
-    const response = await fetch(`${CORS_PROXY}${encodeURIComponent(url)}`);
-    if (!response.ok) throw new Error('Failed to fetch trending');
-    
-    const data: SearchResult = await response.json();
-    return data.data.results.map(convertToTrack);
+    const attempts = [
+      url,
+      `https://cors.isomorphic-git.org/${url}`,
+      `${CORS_PROXY}${encodeURIComponent(url)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+      `https://thingproxy.freeboard.io/fetch/${url}`,
+    ];
+    let lastError: any = null;
+    for (const attemptUrl of attempts) {
+      try {
+        const response = await fetch(attemptUrl);
+        if (response.ok) {
+          const data: SearchResult = await response.json();
+          return data.data.results.map(convertToTrack);
+        }
+        lastError = new Error(`HTTP ${response.status}`);
+      } catch (e) {
+        lastError = e;
+      }
+    }
+    console.error('JioSaavn trending error:', lastError);
+    return [];
   } catch (error) {
     console.error('JioSaavn trending error:', error);
     return [];
@@ -73,6 +107,7 @@ export const getTrendingSongs = async (limit: number = 20) => {
 
 // Fallback sample tracks for when API fails
 const getFallbackTracks = (mood: string): any[] => {
+  const localUrl = '/audio/sample.mp3';
   const fallbackTracks = [
     {
       id: `${mood}-1`,
@@ -81,7 +116,7 @@ const getFallbackTracks = (mood: string): any[] => {
       album: `${mood} Collection`,
       albumArt: 'https://picsum.photos/300/300?random=1',
       duration: 180,
-      url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+      url: localUrl,
     },
     {
       id: `${mood}-2`, 
@@ -90,7 +125,7 @@ const getFallbackTracks = (mood: string): any[] => {
       album: `${mood} Experience`,
       albumArt: 'https://picsum.photos/300/300?random=2',
       duration: 240,
-      url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+      url: localUrl,
     },
     {
       id: `${mood}-3`,
@@ -99,7 +134,7 @@ const getFallbackTracks = (mood: string): any[] => {
       album: `${mood} Stories`,
       albumArt: 'https://picsum.photos/300/300?random=3',
       duration: 195,
-      url: 'https://www.soundjay.com/misc/sounds/bell-ringing-05.wav'
+      url: localUrl,
     }
   ];
   
@@ -160,11 +195,28 @@ export const getSongsByMood = async (mood: string, limit: number = 15) => {
 export const getSongById = async (id: string) => {
   try {
     const url = `${JIOSAAVN_BASE_URL}/songs?ids=${id}`;
-    const response = await fetch(`${CORS_PROXY}${encodeURIComponent(url)}`);
-    if (!response.ok) throw new Error('Song fetch failed');
-    
-    const data: { data: JioSaavnTrack[] } = await response.json();
-    return data.data[0] ? convertToTrack(data.data[0]) : null;
+    const attempts = [
+      url,
+      `https://cors.isomorphic-git.org/${url}`,
+      `${CORS_PROXY}${encodeURIComponent(url)}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+      `https://thingproxy.freeboard.io/fetch/${url}`,
+    ];
+    let lastError: any = null;
+    for (const attemptUrl of attempts) {
+      try {
+        const response = await fetch(attemptUrl);
+        if (response.ok) {
+          const data: { data: JioSaavnTrack[] } = await response.json();
+          return data.data[0] ? convertToTrack(data.data[0]) : null;
+        }
+        lastError = new Error(`HTTP ${response.status}`);
+      } catch (e) {
+        lastError = e;
+      }
+    }
+    console.error('JioSaavn song fetch error:', lastError);
+    return null;
   } catch (error) {
     console.error('JioSaavn song fetch error:', error);
     return null;
