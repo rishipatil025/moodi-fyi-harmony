@@ -1,5 +1,6 @@
 // JioSaavn API integration with fallback sample tracks
 const JIOSAAVN_BASE_URL = 'https://saavn.dev/api';
+const CORS_PROXY = 'https://corsproxy.io/?';
 
 export interface JioSaavnTrack {
   id: string;
@@ -43,7 +44,8 @@ export const convertToTrack = (jiosaavnTrack: JioSaavnTrack) => ({
 // Search for songs
 export const searchSongs = async (query: string, limit: number = 10) => {
   try {
-    const response = await fetch(`${JIOSAAVN_BASE_URL}/search/songs?query=${encodeURIComponent(query)}&limit=${limit}`);
+    const url = `${JIOSAAVN_BASE_URL}/search/songs?query=${encodeURIComponent(query)}&limit=${limit}`;
+    const response = await fetch(`${CORS_PROXY}${encodeURIComponent(url)}`);
     if (!response.ok) throw new Error('Search failed');
     
     const data: SearchResult = await response.json();
@@ -57,7 +59,8 @@ export const searchSongs = async (query: string, limit: number = 10) => {
 // Get trending songs
 export const getTrendingSongs = async (limit: number = 20) => {
   try {
-    const response = await fetch(`${JIOSAAVN_BASE_URL}/search/songs?query=trending&limit=${limit}`);
+    const url = `${JIOSAAVN_BASE_URL}/search/songs?query=trending&limit=${limit}`;
+    const response = await fetch(`${CORS_PROXY}${encodeURIComponent(url)}`);
     if (!response.ok) throw new Error('Failed to fetch trending');
     
     const data: SearchResult = await response.json();
@@ -156,7 +159,8 @@ export const getSongsByMood = async (mood: string, limit: number = 15) => {
 // Get song details by ID
 export const getSongById = async (id: string) => {
   try {
-    const response = await fetch(`${JIOSAAVN_BASE_URL}/songs?ids=${id}`);
+    const url = `${JIOSAAVN_BASE_URL}/songs?ids=${id}`;
+    const response = await fetch(`${CORS_PROXY}${encodeURIComponent(url)}`);
     if (!response.ok) throw new Error('Song fetch failed');
     
     const data: { data: JioSaavnTrack[] } = await response.json();
