@@ -18,7 +18,8 @@ export interface ListenTogetherState {
 }
 
 export const useListenTogether = (
-  onRemoteControl: (action: string, data?: any) => void
+  onRemoteControl: (action: string, data?: any) => void,
+  onError?: (title: string, description: string) => void
 ) => {
   const [state, setState] = useState<ListenTogetherState>({
     isHost: false,
@@ -111,7 +112,10 @@ export const useListenTogether = (
       peer.on('error', (err) => {
         console.error('Peer error:', err.type, err);
         if (err.type === 'peer-unavailable') {
-          alert('Could not connect to peer. Please check the room code.');
+          onError?.(
+            'Connection Failed',
+            'Could not connect to peer. Please check the room code.'
+          );
         }
       });
 
@@ -191,9 +195,15 @@ export const useListenTogether = (
       peer.on('error', (err) => {
         console.error('Peer error:', err.type, err);
         if (err.type === 'peer-unavailable') {
-          alert('Room not found. Please check the room code and try again.');
+          onError?.(
+            'Room Not Found',
+            'Room not found. Please check the room code and try again.'
+          );
         } else if (err.type === 'network') {
-          alert('Network error. Please check your internet connection.');
+          onError?.(
+            'Network Error',
+            'Network error. Please check your internet connection.'
+          );
         }
       });
 

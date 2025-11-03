@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import MoodTiles from "@/components/MoodTiles";
 import PlaylistView from "@/components/PlaylistView";
 import MusicPlayer from "@/components/MusicPlayer";
@@ -15,6 +15,7 @@ import { useListenTogether } from "@/hooks/useListenTogether";
 import { Button } from "@/components/ui/button";
 import { Search, Music, Home, ListMusic, Heart, Clock, Sparkles, Upload, Download, Users } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { debounce } from "@/lib/utils";
 
 interface Mood {
   id: string;
@@ -99,6 +100,14 @@ const Index = () => {
     }
   };
 
+  const handleListenTogetherError = useCallback((title: string, description: string) => {
+    toast({
+      title,
+      description,
+      variant: 'destructive',
+    });
+  }, []);
+
   const {
     state: listenTogetherState,
     createRoom,
@@ -106,9 +115,7 @@ const Index = () => {
     sendControl,
     sendMessage,
     disconnect,
-  } = useListenTogether(handleRemoteControl);
-
-  const lastSentTrackId = useRef<string | null>(null);
+  } = useListenTogether(handleRemoteControl, handleListenTogetherError);
 
   const playTrackWithSync = (track: any, tracks?: any[]) => {
     playTrack(track, tracks ?? queue);
@@ -117,6 +124,7 @@ const Index = () => {
     }
   };
 
+  // Initial sync when connection is established
   useEffect(() => {
     if (listenTogetherState.isHost && listenTogetherState.isConnected && currentTrack) {
       sendControl('play', { track: currentTrack, queue, time: currentTime, volume });
@@ -124,13 +132,26 @@ const Index = () => {
         sendControl('pause');
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [listenTogetherState.isConnected]);
+  }, [listenTogetherState.isConnected, listenTogetherState.isHost, currentTrack, queue, currentTime, volume, isPlaying, sendControl]);
+
+  // Auto-play sync: Send sync when track changes automatically
+  const prevTrackRef = useRef<any>(null);
+  useEffect(() => {
+    if (listenTogetherState.isHost && listenTogetherState.isConnected && currentTrack) {
+      // Only sync if track actually changed (not just on mount)
+      if (prevTrackRef.current && prevTrackRef.current.id !== currentTrack.id) {
+        sendControl('play', { track: currentTrack, queue, time: 0, volume });
+      }
+      prevTrackRef.current = currentTrack;
+    }
+  }, [currentTrack, listenTogetherState.isHost, listenTogetherState.isConnected, queue, volume, sendControl]);
 
   const handlePlayPauseWithSync = () => {
+    // Capture the CURRENT state before toggling (will be inverted after toggle)
+    const willBePlaying = !isPlaying;
     togglePlayPause();
     if (listenTogetherState.isHost && listenTogetherState.isConnected) {
-      sendControl(isPlaying ? 'pause' : 'play', { 
+      sendControl(willBePlaying ? 'play' : 'pause', { 
         track: currentTrack, 
         queue,
         time: currentTime,
@@ -153,18 +174,33 @@ const Index = () => {
     }
   };
 
+  // Debounced sync functions to prevent flooding connection
+  const debouncedSeekSync = useCallback(
+    debounce((time: number) => {
+      if (listenTogetherState.isHost && listenTogetherState.isConnected) {
+        sendControl('seek', { time });
+      }
+    }, 300),
+    [listenTogetherState.isHost, listenTogetherState.isConnected, sendControl]
+  );
+
+  const debouncedVolumeSync = useCallback(
+    debounce((vol: number) => {
+      if (listenTogetherState.isHost && listenTogetherState.isConnected) {
+        sendControl('volume', { volume: vol });
+      }
+    }, 300),
+    [listenTogetherState.isHost, listenTogetherState.isConnected, sendControl]
+  );
+
   const handleSeekWithSync = (time: number) => {
     seekTo(time);
-    if (listenTogetherState.isHost && listenTogetherState.isConnected) {
-      sendControl('seek', { time });
-    }
+    debouncedSeekSync(time);
   };
 
   const handleVolumeWithSync = (vol: number) => {
     setVolume(vol);
-    if (listenTogetherState.isHost && listenTogetherState.isConnected) {
-      sendControl('volume', { volume: vol });
-    }
+    debouncedVolumeSync(vol);
   };
 
   const handleMoodSelect = async (mood: Mood) => {
