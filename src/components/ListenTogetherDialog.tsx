@@ -64,12 +64,36 @@ export const ListenTogetherDialog = ({
     }
   };
 
-  const handleJoin = () => {
+  const primeAudioPlayback = async () => {
+    try {
+      const audio = new Audio('/audio/sample.mp3');
+      audio.muted = true;
+      audio.volume = 0;
+      await audio.play();
+      setTimeout(() => {
+        try { audio.pause(); } catch {}
+        // @ts-ignore
+        audio.src = '';
+      }, 120);
+      console.log('[AudioUnlock] Primed audio playback');
+    } catch (e) {
+      console.warn('[AudioUnlock] Failed to prime audio', e);
+    }
+  };
+
+  const handleCreate = async () => {
+    toast({ title: 'Preparing audio', description: 'Priming audio for playback...' });
+    await primeAudioPlayback();
+    onCreateRoom();
+  };
+
+  const handleJoin = async () => {
     if (joinCode.trim()) {
       toast({
         title: 'Connecting...',
         description: 'Attempting to join the room',
       });
+      await primeAudioPlayback();
       onJoinRoom(joinCode.trim());
     } else {
       toast({
@@ -103,7 +127,7 @@ export const ListenTogetherDialog = ({
             <div className="space-y-3">
               <h3 className="text-sm font-medium">Host a Session</h3>
               {!roomCode ? (
-                <Button onClick={onCreateRoom} className="w-full">
+                <Button onClick={handleCreate} className="w-full">
                   Create Room
                 </Button>
               ) : (

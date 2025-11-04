@@ -32,6 +32,10 @@ const Index = () => {
   const [listenTogetherOpen, setListenTogetherOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  // Dedup/guard for remote controls on guest
+  const remoteActionRef = useRef<{ lastType: string; lastAt: number }>({ lastType: '', lastAt: 0 });
+  const processingRemotePlayRef = useRef(false);
+  const lastRemotePlayAtRef = useRef(0);
   
   const {
     currentTrack,
@@ -75,30 +79,57 @@ const Index = () => {
 
   const handleRemoteControl = (action: string, data?: any) => {
     console.log('[Guest] Received remote control:', action, data);
+
+    // Deduplicate rapid identical actions to avoid flicker
+    const now = Date.now();
+    const last = remoteActionRef.current;
+    if (last.lastType === action && now - last.lastAt < 300) {
+      console.log('[Guest] Ignoring duplicate action:', action);
+      return;
+    }
+    remoteActionRef.current = { lastType: action, lastAt: now };
+
     switch (action) {
-      case 'play':
-        if (data?.track) {
-          console.log('[Guest] Playing track:', data.track.title);
-          playTrack(data.track, data.queue || [data.track]);
-          // Wait for track to load, then ensure it's playing and synced
-          setTimeout(() => {
+      case 'play': {
+        if (!data?.track) return;
+        if (processingRemotePlayRef.current) {
+          console.log('[Guest] Play already processing, skipped');
+          return;
+        }
+        processingRemotePlayRef.current = true;
+        lastRemotePlayAtRef.current = now;
+
+        console.log('[Guest] Playing track:', data.track.title);
+        playTrack(data.track, data.queue || [data.track]);
+
+        // Wait for track to load, then ensure it's playing and synced
+        setTimeout(() => {
+          try {
             if (typeof data.time === 'number') seekTo(data.time);
             if (typeof data.volume === 'number') setVolume(data.volume);
-            // Force play if not already playing
-            const audioElement = document.querySelector('audio');
+            const audioElement = document.querySelector('audio') as HTMLAudioElement | null;
             if (audioElement && audioElement.paused) {
               audioElement.play().catch(e => console.error('[Guest] Play failed:', e));
             }
-          }, 150);
-        }
+          } finally {
+            processingRemotePlayRef.current = false;
+          }
+        }, 150);
         break;
-      case 'pause':
+      }
+      case 'pause': {
+        // Ignore pause immediately after play to avoid flip-flop
+        if (now - lastRemotePlayAtRef.current < 250) {
+          console.log('[Guest] Ignoring pause right after play');
+          return;
+        }
         console.log('[Guest] Pausing playback');
-        const audioElement = document.querySelector('audio');
+        const audioElement = document.querySelector('audio') as HTMLAudioElement | null;
         if (audioElement && !audioElement.paused) {
           audioElement.pause();
         }
         break;
+      }
       case 'next':
         console.log('[Guest] Playing next track');
         playNext();
