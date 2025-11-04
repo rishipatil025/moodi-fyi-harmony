@@ -90,8 +90,9 @@ export const useListenTogether = (
         });
 
         conn.on('data', (data: any) => {
-          console.log('Host received:', data);
+          console.log('[Host] Received data from guest:', data);
           if (data.type === 'chat') {
+            console.log('[Host] Received chat message:', data.message);
             setState(prev => ({
               ...prev,
               messages: [...prev.messages, {
@@ -161,20 +162,25 @@ export const useListenTogether = (
         });
 
         conn.on('data', (data: any) => {
-          console.log('Guest received:', data);
+          console.log('[Guest] Received data from host:', data);
           if (data.action) {
             onRemoteControl(data.action, data.data);
           }
           if (data.type === 'chat') {
-            setState(prev => ({
-              ...prev,
-              messages: [...prev.messages, {
+            console.log('[Guest] Received chat message:', data.message);
+            setState(prev => {
+              const newMessages = [...prev.messages, {
                 id: Date.now().toString(),
                 message: data.message,
                 timestamp: new Date(),
                 isOwn: false,
-              }],
-            }));
+              }];
+              console.log('[Guest] Updated messages state:', newMessages);
+              return {
+                ...prev,
+                messages: newMessages,
+              };
+            });
           }
         });
 
@@ -229,21 +235,33 @@ export const useListenTogether = (
 
   const sendMessage = (message: string) => {
     if (connectionRef.current && connectionRef.current.open) {
-      console.log('Sending message:', message);
+      const role = peerRef.current ? (state.isHost ? '[Host]' : '[Guest]') : '[Unknown]';
+      console.log(`${role} Sending message:`, message);
+      console.log(`${role} Connection open:`, connectionRef.current.open);
       try {
         connectionRef.current.send({ type: 'chat', message });
-        setState(prev => ({
-          ...prev,
-          messages: [...prev.messages, {
+        console.log(`${role} Message sent successfully`);
+        setState(prev => {
+          const newMessages = [...prev.messages, {
             id: Date.now().toString(),
             message,
             timestamp: new Date(),
             isOwn: true,
-          }],
-        }));
+          }];
+          console.log(`${role} Updated own messages:`, newMessages);
+          return {
+            ...prev,
+            messages: newMessages,
+          };
+        });
       } catch (err) {
-        console.error('Failed to send message:', err);
+        console.error(`${role} Failed to send message:`, err);
       }
+    } else {
+      console.warn('Cannot send message: connection not open', {
+        hasConnection: !!connectionRef.current,
+        isOpen: connectionRef.current?.open,
+      });
     }
   };
 

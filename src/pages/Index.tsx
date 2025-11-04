@@ -74,28 +74,45 @@ const Index = () => {
   } = useMusicPlayer();
 
   const handleRemoteControl = (action: string, data?: any) => {
+    console.log('[Guest] Received remote control:', action, data);
     switch (action) {
       case 'play':
         if (data) {
+          console.log('[Guest] Playing track:', data.track?.title);
           playTrack(data.track, data.queue);
+          // Ensure playback starts even if paused
+          if (!isPlaying) {
+            setTimeout(() => togglePlayPause(), 100);
+          }
           if (typeof data.time === 'number') seekTo(data.time);
           if (typeof data.volume === 'number') setVolume(data.volume);
         }
         break;
       case 'pause':
-        if (isPlaying) togglePlayPause();
+        if (isPlaying) {
+          console.log('[Guest] Pausing playback');
+          togglePlayPause();
+        }
         break;
       case 'next':
+        console.log('[Guest] Playing next track');
         playNext();
         break;
       case 'previous':
+        console.log('[Guest] Playing previous track');
         playPrevious();
         break;
       case 'seek':
-        if (data?.time !== undefined) seekTo(data.time);
+        if (data?.time !== undefined) {
+          console.log('[Guest] Seeking to:', data.time);
+          seekTo(data.time);
+        }
         break;
       case 'volume':
-        if (data?.volume !== undefined) setVolume(data.volume);
+        if (data?.volume !== undefined) {
+          console.log('[Guest] Setting volume:', data.volume);
+          setVolume(data.volume);
+        }
         break;
     }
   };
