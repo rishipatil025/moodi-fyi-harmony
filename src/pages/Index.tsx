@@ -77,21 +77,26 @@ const Index = () => {
     console.log('[Guest] Received remote control:', action, data);
     switch (action) {
       case 'play':
-        if (data) {
-          console.log('[Guest] Playing track:', data.track?.title);
-          playTrack(data.track, data.queue);
-          // Ensure playback starts even if paused
-          if (!isPlaying) {
-            setTimeout(() => togglePlayPause(), 100);
-          }
-          if (typeof data.time === 'number') seekTo(data.time);
-          if (typeof data.volume === 'number') setVolume(data.volume);
+        if (data?.track) {
+          console.log('[Guest] Playing track:', data.track.title);
+          playTrack(data.track, data.queue || [data.track]);
+          // Wait for track to load, then ensure it's playing and synced
+          setTimeout(() => {
+            if (typeof data.time === 'number') seekTo(data.time);
+            if (typeof data.volume === 'number') setVolume(data.volume);
+            // Force play if not already playing
+            const audioElement = document.querySelector('audio');
+            if (audioElement && audioElement.paused) {
+              audioElement.play().catch(e => console.error('[Guest] Play failed:', e));
+            }
+          }, 150);
         }
         break;
       case 'pause':
-        if (isPlaying) {
-          console.log('[Guest] Pausing playback');
-          togglePlayPause();
+        console.log('[Guest] Pausing playback');
+        const audioElement = document.querySelector('audio');
+        if (audioElement && !audioElement.paused) {
+          audioElement.pause();
         }
         break;
       case 'next':
@@ -141,15 +146,23 @@ const Index = () => {
     }
   };
 
-  // Initial sync when connection is established
+  // Initial sync when connection is established (only once)
+  const hasInitialSyncedRef = useRef(false);
   useEffect(() => {
-    if (listenTogetherState.isHost && listenTogetherState.isConnected && currentTrack) {
-      sendControl('play', { track: currentTrack, queue, time: currentTime, volume });
-      if (!isPlaying) {
-        sendControl('pause');
-      }
+    if (listenTogetherState.isHost && listenTogetherState.isConnected && currentTrack && !hasInitialSyncedRef.current) {
+      console.log('[Host] Initial sync to guest');
+      hasInitialSyncedRef.current = true;
+      setTimeout(() => {
+        sendControl('play', { track: currentTrack, queue, time: currentTime, volume });
+        if (!isPlaying) {
+          sendControl('pause');
+        }
+      }, 500);
     }
-  }, [listenTogetherState.isConnected, listenTogetherState.isHost, currentTrack, queue, currentTime, volume, isPlaying, sendControl]);
+    if (!listenTogetherState.isConnected) {
+      hasInitialSyncedRef.current = false;
+    }
+  }, [listenTogetherState.isConnected]);
 
   // Auto-play sync: Send sync when track changes automatically
   const prevTrackRef = useRef<any>(null);
