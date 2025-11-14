@@ -530,7 +530,7 @@ const Index = () => {
         onJoinRoom={joinRoom}
         roomCode={listenTogetherState.roomCode}
         isConnected={listenTogetherState.isConnected}
-        connectedUser={listenTogetherState.connectedUser}
+        connectedUsers={listenTogetherState.connectedUsers}
         onDisconnect={disconnect}
         messages={listenTogetherState.messages}
         onSendMessage={sendMessage}

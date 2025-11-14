@@ -12,7 +12,7 @@ export interface ListenTogetherState {
   isHost: boolean;
   isConnected: boolean;
   roomCode: string | null;
-  connectedUser: string | null;
+  connectedUsers: string[];
   peer: Peer | null;
   messages: ChatMessage[];
 }
@@ -25,19 +25,18 @@ export const useListenTogether = (
     isHost: false,
     isConnected: false,
     roomCode: null,
-    connectedUser: null,
+    connectedUsers: [],
     peer: null,
     messages: [],
   });
 
-  const connectionRef = useRef<DataConnection | null>(null);
+  const connectionsRef = useRef<Map<string, DataConnection>>(new Map());
   const peerRef = useRef<Peer | null>(null);
 
   useEffect(() => {
     return () => {
-      if (connectionRef.current) {
-        connectionRef.current.close();
-      }
+      connectionsRef.current.forEach(conn => conn.close());
+      connectionsRef.current.clear();
       if (peerRef.current) {
         peerRef.current.destroy();
       }
@@ -69,28 +68,29 @@ export const useListenTogether = (
 
       peer.on('connection', (conn) => {
         console.log('Guest connected:', conn.peer);
-        connectionRef.current = conn;
+        connectionsRef.current.set(conn.peer, conn);
         
         conn.on('open', () => {
-          console.log('Connection established with guest');
+          console.log('Connection established with guest:', conn.peer);
           setState(prev => ({
             ...prev,
             isConnected: true,
-            connectedUser: conn.peer,
+            connectedUsers: Array.from(connectionsRef.current.keys()),
           }));
         });
 
         conn.on('close', () => {
-          console.log('Guest disconnected');
+          console.log('Guest disconnected:', conn.peer);
+          connectionsRef.current.delete(conn.peer);
           setState(prev => ({
             ...prev,
-            isConnected: false,
-            connectedUser: null,
+            isConnected: connectionsRef.current.size > 0,
+            connectedUsers: Array.from(connectionsRef.current.keys()),
           }));
         });
 
         conn.on('data', (data: any) => {
-          console.log('[Host] Received data from guest:', data);
+          console.log('[Host] Received data from guest:', conn.peer, data);
           if (data.type === 'chat') {
             console.log('[Host] Received chat message:', data.message);
             setState(prev => ({
@@ -147,7 +147,7 @@ export const useListenTogether = (
         const conn = peer.connect(roomCode, {
           reliable: true,
         });
-        connectionRef.current = conn;
+        connectionsRef.current.set(roomCode, conn);
 
         conn.on('open', () => {
           console.log('Successfully connected to host');
@@ -156,7 +156,7 @@ export const useListenTogether = (
             isHost: false,
             isConnected: true,
             roomCode,
-            connectedUser: roomCode,
+            connectedUsers: [roomCode],
             peer,
           }));
         });
@@ -189,7 +189,7 @@ export const useListenTogether = (
           setState(prev => ({
             ...prev,
             isConnected: false,
-            connectedUser: null,
+            connectedUsers: [],
           }));
         });
 
@@ -223,60 +223,87 @@ export const useListenTogether = (
   };
 
   const sendControl = (action: string, data?: any) => {
-    if (connectionRef.current && state.isHost && connectionRef.current.open) {
-      console.log('Sending control:', action, data);
-      try {
-        connectionRef.current.send({ action, data });
-      } catch (err) {
-        console.error('Failed to send control:', err);
-      }
+    if (!state.isHost || connectionsRef.current.size === 0) {
+      console.error('Cannot send control: not host or no connections');
+      return;
     }
+    
+    console.log('[Host] Broadcasting control to', connectionsRef.current.size, 'guests:', action, data);
+    const message = {
+      type: 'control',
+      action,
+      data,
+    };
+    
+    connectionsRef.current.forEach((conn, peerId) => {
+      try {
+        if (conn.open) {
+          conn.send(message);
+        }
+      } catch (err) {
+        console.error(`Failed to send control to ${peerId}:`, err);
+      }
+    });
   };
 
   const sendMessage = (message: string) => {
-    if (connectionRef.current && connectionRef.current.open) {
-      const role = peerRef.current ? (state.isHost ? '[Host]' : '[Guest]') : '[Unknown]';
-      console.log(`${role} Sending message:`, message);
-      console.log(`${role} Connection open:`, connectionRef.current.open);
-      try {
-        connectionRef.current.send({ type: 'chat', message });
-        console.log(`${role} Message sent successfully`);
-        setState(prev => {
-          const newMessages = [...prev.messages, {
-            id: Date.now().toString(),
-            message,
-            timestamp: new Date(),
-            isOwn: true,
-          }];
-          console.log(`${role} Updated own messages:`, newMessages);
-          return {
-            ...prev,
-            messages: newMessages,
-          };
-        });
-      } catch (err) {
-        console.error(`${role} Failed to send message:`, err);
+    console.log('[SendMessage] Attempting to send:', message);
+    
+    const connections = state.isHost 
+      ? connectionsRef.current 
+      : new Map([[state.roomCode || '', connectionsRef.current.get(state.roomCode || '') as DataConnection]]);
+    
+    console.log('[SendMessage] Broadcasting to', connections.size, 'connection(s)');
+
+    if (connections.size === 0) {
+      console.error('[SendMessage] No active connections');
+      return;
+    }
+
+    const chatMessage = {
+      type: 'chat',
+      message,
+    };
+
+    let sentCount = 0;
+    connections.forEach((conn, peerId) => {
+      if (conn && conn.open) {
+        try {
+          conn.send(chatMessage);
+          sentCount++;
+          console.log('[SendMessage] Sent to peer:', peerId);
+        } catch (err) {
+          console.error('[SendMessage] Failed to send to', peerId, err);
+        }
       }
-    } else {
-      console.warn('Cannot send message: connection not open', {
-        hasConnection: !!connectionRef.current,
-        isOpen: connectionRef.current?.open,
-      });
+    });
+
+    if (sentCount > 0) {
+      console.log('[SendMessage] Successfully sent to', sentCount, 'peer(s)');
+      setState(prev => ({
+        ...prev,
+        messages: [...prev.messages, {
+          id: Date.now().toString(),
+          message,
+          timestamp: new Date(),
+          isOwn: true,
+        }],
+      }));
     }
   };
 
   const disconnect = () => {
-    if (connectionRef.current) {
-      connectionRef.current.close();
-    }
+    connectionsRef.current.forEach(conn => conn.close());
+    connectionsRef.current.clear();
     if (peerRef.current) {
       peerRef.current.destroy();
+      peerRef.current = null;
     }
     setState({
       isHost: false,
       isConnected: false,
       roomCode: null,
-      connectedUser: null,
+      connectedUsers: [],
       peer: null,
       messages: [],
     });
