@@ -8,13 +8,21 @@ export interface ChatMessage {
   isOwn: boolean;
 }
 
+export interface ConnectedUser {
+  id: string;
+  nickname: string;
+  color: string;
+}
+
 export interface ListenTogetherState {
   isHost: boolean;
   isConnected: boolean;
   roomCode: string | null;
-  connectedUsers: string[];
+  connectedUsers: ConnectedUser[];
   peer: Peer | null;
   messages: ChatMessage[];
+  userNickname: string | null;
+  userColor: string | null;
 }
 
 export const useListenTogether = (
@@ -28,6 +36,8 @@ export const useListenTogether = (
     connectedUsers: [],
     peer: null,
     messages: [],
+    userNickname: null,
+    userColor: null,
   });
 
   const connectionsRef = useRef<Map<string, DataConnection>>(new Map());
@@ -45,7 +55,15 @@ export const useListenTogether = (
     };
   }, []);
 
-  const createRoom = () => {
+  const generateColor = () => {
+    const colors = [
+      '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
+      '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  };
+
+  const createRoom = (nickname: string) => {
     try {
       const peer = new Peer({
         debug: 2,
@@ -60,11 +78,14 @@ export const useListenTogether = (
 
       peer.on('open', (id) => {
         console.log('Room created with ID:', id);
+        const userColor = generateColor();
         setState(prev => ({
           ...prev,
           isHost: true,
           roomCode: id,
           peer,
+          userNickname: nickname,
+          userColor,
         }));
       });
 
@@ -74,26 +95,41 @@ export const useListenTogether = (
         
         conn.on('open', () => {
           console.log('Connection established with guest:', conn.peer);
-          setState(prev => ({
-            ...prev,
-            isConnected: true,
-            connectedUsers: Array.from(connectionsRef.current.keys()),
-          }));
+          
+          // Send host info to guest
+          conn.send({
+            type: 'user_info',
+            user: {
+              id: peer.id,
+              nickname,
+              color: state.userColor || generateColor(),
+            }
+          });
         });
-
-        conn.on('close', () => {
-          console.log('Guest disconnected:', conn.peer);
-          connectionsRef.current.delete(conn.peer);
-          setState(prev => ({
-            ...prev,
-            isConnected: connectionsRef.current.size > 0,
-            connectedUsers: Array.from(connectionsRef.current.keys()),
-          }));
-        });
-
+        
         conn.on('data', (data: any) => {
           console.log('[Host] Received data from guest:', conn.peer, data);
-          if (data.type === 'chat') {
+          
+          if (data.type === 'user_info') {
+            setState(prev => {
+              const existingUser = prev.connectedUsers.find(u => u.id === conn.peer);
+              const newUser: ConnectedUser = {
+                id: conn.peer,
+                nickname: data.user.nickname,
+                color: data.user.color,
+              };
+              
+              const updatedUsers = existingUser 
+                ? prev.connectedUsers.map(u => u.id === conn.peer ? newUser : u)
+                : [...prev.connectedUsers, newUser];
+              
+              return {
+                ...prev,
+                isConnected: true,
+                connectedUsers: updatedUsers,
+              };
+            });
+          } else if (data.type === 'chat') {
             console.log('[Host] Received chat message:', data.message);
             setState(prev => ({
               ...prev,
@@ -105,6 +141,16 @@ export const useListenTogether = (
               }],
             }));
           }
+        });
+
+        conn.on('close', () => {
+          console.log('Guest disconnected:', conn.peer);
+          connectionsRef.current.delete(conn.peer);
+          setState(prev => ({
+            ...prev,
+            isConnected: connectionsRef.current.size > 0,
+            connectedUsers: prev.connectedUsers.filter(u => u.id !== conn.peer),
+          }));
         });
 
         conn.on('error', (err) => {
@@ -131,7 +177,7 @@ export const useListenTogether = (
     }
   };
 
-  const joinRoom = (roomCode: string) => {
+  const joinRoom = (roomCode: string, nickname: string) => {
     try {
       const peer = new Peer({
         debug: 2,
@@ -150,25 +196,51 @@ export const useListenTogether = (
           reliable: true,
         });
         connectionsRef.current.set(roomCode, conn);
+        const userColor = generateColor();
 
         conn.on('open', () => {
           console.log('Successfully connected to host');
+          
+          // Send guest info to host
+          conn.send({
+            type: 'user_info',
+            user: {
+              id: id,
+              nickname,
+              color: userColor,
+            }
+          });
+          
           setState(prev => ({
             ...prev,
             isHost: false,
             isConnected: true,
             roomCode,
-            connectedUsers: [roomCode],
+            connectedUsers: [],
             peer,
+            userNickname: nickname,
+            userColor,
           }));
         });
 
         conn.on('data', (data: any) => {
           console.log('[Guest] Received data from host:', data);
-          if (data.action) {
+          
+          if (data.type === 'user_info') {
+            setState(prev => {
+              const hostUser: ConnectedUser = {
+                id: roomCode,
+                nickname: data.user.nickname,
+                color: data.user.color,
+              };
+              return {
+                ...prev,
+                connectedUsers: [hostUser],
+              };
+            });
+          } else if (data.action) {
             onRemoteControl(data.action, data.data);
-          }
-          if (data.type === 'chat') {
+          } else if (data.type === 'chat') {
             console.log('[Guest] Received chat message:', data.message);
             setState(prev => {
               const newMessages = [...prev.messages, {
@@ -308,6 +380,8 @@ export const useListenTogether = (
       connectedUsers: [],
       peer: null,
       messages: [],
+      userNickname: null,
+      userColor: null,
     });
   };
 
