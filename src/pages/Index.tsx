@@ -523,18 +523,20 @@ const Index = () => {
         onToggleFavorite={() => currentTrack && toggleFavorite(currentTrack)}
       />
 
-      <ListenTogetherDialog
-        open={listenTogetherOpen}
-        onOpenChange={setListenTogetherOpen}
-        onCreateRoom={createRoom}
-        onJoinRoom={joinRoom}
-        roomCode={listenTogetherState.roomCode}
-        isConnected={listenTogetherState.isConnected}
-        connectedUsers={listenTogetherState.connectedUsers}
-        onDisconnect={disconnect}
-        messages={listenTogetherState.messages}
-        onSendMessage={sendMessage}
-      />
+        <ListenTogetherDialog
+          open={listenTogetherOpen}
+          onOpenChange={setListenTogetherOpen}
+          onCreateRoom={createRoom}
+          onJoinRoom={joinRoom}
+          roomCode={listenTogetherState.roomCode}
+          isConnected={listenTogetherState.isConnected}
+          connectedUsers={listenTogetherState.connectedUsers}
+          onDisconnect={disconnect}
+          messages={listenTogetherState.messages}
+          onSendMessage={sendMessage}
+          userNickname={listenTogetherState.userNickname}
+          isHost={listenTogetherState.isHost}
+        />
     </div>
   );
 };

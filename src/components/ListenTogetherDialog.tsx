@@ -3,21 +3,24 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Users, Copy, Check, Send, MessageCircle } from 'lucide-react';
+import { Users, Copy, Check, Send, MessageCircle, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { ChatMessage } from '@/hooks/useListenTogether';
+import { ChatMessage, ConnectedUser } from '@/hooks/useListenTogether';
+import { Label } from '@/components/ui/label';
 
 interface ListenTogetherDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onCreateRoom: () => void;
-  onJoinRoom: (code: string) => void;
+  onCreateRoom: (nickname: string) => void;
+  onJoinRoom: (code: string, nickname: string) => void;
   roomCode: string | null;
   isConnected: boolean;
-  connectedUsers: string[];
+  connectedUsers: ConnectedUser[];
   onDisconnect: () => void;
   messages: ChatMessage[];
   onSendMessage: (message: string) => void;
+  userNickname: string | null;
+  isHost: boolean;
 }
 
 export const ListenTogetherDialog = ({
@@ -31,8 +34,11 @@ export const ListenTogetherDialog = ({
   onDisconnect,
   messages,
   onSendMessage,
+  userNickname,
+  isHost,
 }: ListenTogetherDialogProps) => {
   const [joinCode, setJoinCode] = useState('');
+  const [nickname, setNickname] = useState('');
   const [copied, setCopied] = useState(false);
   const [chatMessage, setChatMessage] = useState('');
   const [showChat, setShowChat] = useState(false);
@@ -82,19 +88,35 @@ export const ListenTogetherDialog = ({
   };
 
   const handleCreate = async () => {
+    if (!nickname.trim()) {
+      toast({
+        title: 'Nickname required',
+        description: 'Please enter a nickname',
+        variant: 'destructive',
+      });
+      return;
+    }
     toast({ title: 'Preparing audio', description: 'Priming audio for playback...' });
     await primeAudioPlayback();
-    onCreateRoom();
+    onCreateRoom(nickname.trim());
   };
 
   const handleJoin = async () => {
+    if (!nickname.trim()) {
+      toast({
+        title: 'Nickname required',
+        description: 'Please enter a nickname',
+        variant: 'destructive',
+      });
+      return;
+    }
     if (joinCode.trim()) {
       toast({
         title: 'Connecting...',
         description: 'Attempting to join the room',
       });
       await primeAudioPlayback();
-      onJoinRoom(joinCode.trim());
+      onJoinRoom(joinCode.trim(), nickname.trim());
     } else {
       toast({
         title: 'Invalid room code',
@@ -123,11 +145,25 @@ export const ListenTogetherDialog = ({
 
         {!isConnected ? (
           <div className="space-y-6">
+            {/* Nickname Input */}
+            {!roomCode && (
+              <div className="space-y-2">
+                <Label htmlFor="nickname">Your Nickname</Label>
+                <Input
+                  id="nickname"
+                  placeholder="Enter your nickname"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  maxLength={20}
+                />
+              </div>
+            )}
+
             {/* Host Section */}
             <div className="space-y-3">
               <h3 className="text-sm font-medium">Host a Session</h3>
               {!roomCode ? (
-                <Button onClick={handleCreate} className="w-full">
+                <Button onClick={handleCreate} className="w-full" disabled={!nickname.trim()}>
                   Create Room
                 </Button>
               ) : (
@@ -172,30 +208,50 @@ export const ListenTogetherDialog = ({
             </div>
 
             {/* Join Section */}
-            <div className="space-y-3">
-              <h3 className="text-sm font-medium">Join a Session</h3>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Enter room code"
-                  value={joinCode}
-                  onChange={(e) => setJoinCode(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-                />
-                <Button onClick={handleJoin}>Join</Button>
+            {!roomCode && (
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium">Join a Session</h3>
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter room code"
+                    value={joinCode}
+                    onChange={(e) => setJoinCode(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
+                  />
+                  <Button onClick={handleJoin} disabled={!nickname.trim()}>Join</Button>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         ) : (
           <div className="space-y-4 flex-1 flex flex-col">
-            <div className="rounded-lg bg-gradient-to-r from-primary/20 to-purple-500/20 p-4 text-center border border-primary/20 animate-fade-in">
+            <div className="rounded-lg bg-gradient-to-r from-primary/20 to-purple-500/20 p-4 border border-primary/20 animate-fade-in">
               <Users className="w-8 h-8 mx-auto mb-2 text-primary animate-pulse" />
-              <p className="text-sm font-medium">Connected!</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {connectedUsers.length > 0 
-                  ? `Listening with ${connectedUsers.length} ${connectedUsers.length === 1 ? 'person' : 'people'}`
-                  : 'Connected!'
-                }
-              </p>
+              <p className="text-sm font-medium text-center">Connected as {userNickname}</p>
+              
+              {/* Connected Users List */}
+              {connectedUsers.length > 0 && (
+                <div className="mt-3 space-y-2">
+                  <p className="text-xs text-muted-foreground text-center">
+                    {isHost ? 'Guests' : 'Host'}:
+                  </p>
+                  <div className="space-y-1">
+                    {connectedUsers.map((user) => (
+                      <div 
+                        key={user.id} 
+                        className="flex items-center gap-2 text-sm p-2 rounded bg-background/50"
+                      >
+                        <div 
+                          className="w-3 h-3 rounded-full" 
+                          style={{ backgroundColor: user.color }}
+                        />
+                        <User className="w-3 h-3" />
+                        <span className="truncate">{user.nickname}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Chat Toggle */}
