@@ -14,7 +14,7 @@ interface ListenTogetherDialogProps {
   onJoinRoom: (code: string) => void;
   roomCode: string | null;
   isConnected: boolean;
-  connectedUser: string | null;
+  connectedUsers: string[];
   onDisconnect: () => void;
   messages: ChatMessage[];
   onSendMessage: (message: string) => void;
@@ -27,7 +27,7 @@ export const ListenTogetherDialog = ({
   onJoinRoom,
   roomCode,
   isConnected,
-  connectedUser,
+  connectedUsers,
   onDisconnect,
   messages,
   onSendMessage,
@@ -191,7 +191,10 @@ export const ListenTogetherDialog = ({
               <Users className="w-8 h-8 mx-auto mb-2 text-primary animate-pulse" />
               <p className="text-sm font-medium">Connected!</p>
               <p className="text-xs text-muted-foreground mt-1">
-                Listening with: {connectedUser?.substring(0, 8)}...
+                {connectedUsers.length > 0 
+                  ? `Listening with ${connectedUsers.length} ${connectedUsers.length === 1 ? 'person' : 'people'}`
+                  : 'Connected!'
+                }
               </p>
             </div>
 
