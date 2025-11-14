@@ -35,8 +35,10 @@ export const useListenTogether = (
 
   useEffect(() => {
     return () => {
-      connectionsRef.current.forEach(conn => conn.close());
-      connectionsRef.current.clear();
+      if (connectionsRef.current) {
+        connectionsRef.current.forEach(conn => conn.close());
+        connectionsRef.current.clear();
+      }
       if (peerRef.current) {
         peerRef.current.destroy();
       }
