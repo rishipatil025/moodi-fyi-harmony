@@ -12,6 +12,7 @@ import { DiscoverView } from "@/components/DiscoverView";
 import { ListenTogetherDialog } from "@/components/ListenTogetherDialog";
 import { useMusicPlayer } from "@/hooks/useMusicPlayer";
 import { useListenTogether } from "@/hooks/useListenTogether";
+import { FloatingEmoji } from "@/components/FloatingEmoji";
 import { Button } from "@/components/ui/button";
 import { Search, Music, Home, ListMusic, Heart, Clock, Sparkles, Upload, Download, Users } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
@@ -167,6 +168,7 @@ const Index = () => {
     joinRoom,
     sendControl,
     sendMessage,
+    sendReaction,
     disconnect,
   } = useListenTogether(handleRemoteControl, handleListenTogetherError);
 
@@ -521,7 +523,13 @@ const Index = () => {
         onToggleShuffle={toggleShuffle}
         onToggleRepeat={toggleRepeat}
         onToggleFavorite={() => currentTrack && toggleFavorite(currentTrack)}
+        isListeningTogether={listenTogetherState.isConnected}
+        onSendReaction={sendReaction}
       />
+
+      {listenTogetherState.isConnected && (
+        <FloatingEmoji reactions={listenTogetherState.reactions} />
+      )}
 
         <ListenTogetherDialog
           open={listenTogetherOpen}

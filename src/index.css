@@ -203,6 +203,29 @@
     }
   }
 
+  /* Floating Emoji Reactions */
+  @keyframes float-up {
+    0% {
+      transform: translateY(0) scale(0);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+      transform: translateY(-10px) scale(1);
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-400px) scale(1.2);
+      opacity: 0;
+    }
+  }
+
+  .animate-float-up {
+    animation: float-up 3s ease-out forwards;
+  }
+
   /* Scroll Animations */
   .fade-in-up {
     opacity: 0;

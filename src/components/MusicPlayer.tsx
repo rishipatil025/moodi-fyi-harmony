@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Play, Pause, SkipBack, SkipForward, Volume2, Shuffle, Repeat, Heart } from 'lucide-react';
+import { Play, Pause, SkipBack, SkipForward, Volume2, Shuffle, Repeat, Heart, Smile } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface Track {
   id: string;
@@ -28,6 +29,8 @@ interface MusicPlayerProps {
   onToggleShuffle: () => void;
   onToggleRepeat: () => void;
   onToggleFavorite: () => void;
+  isListeningTogether?: boolean;
+  onSendReaction?: (emoji: string) => void;
 }
 
 const MusicPlayer = ({
@@ -46,7 +49,12 @@ const MusicPlayer = ({
   onToggleShuffle,
   onToggleRepeat,
   onToggleFavorite,
+  isListeningTogether = false,
+  onSendReaction,
 }: MusicPlayerProps) => {
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
+  const emojis = ['❤️', '🔥', '👏', '🎵', '✨', '😍', '🎉', '💯'];
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -105,6 +113,36 @@ const MusicPlayer = ({
           >
             <Heart className={`w-4 h-4 ${isFavorite ? 'fill-current' : ''}`} />
           </Button>
+
+          {isListeningTogether && onSendReaction && (
+            <Popover open={showEmojiPicker} onOpenChange={setShowEmojiPicker}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="opacity-70 hover:opacity-100 transition-all text-muted-foreground"
+                >
+                  <Smile className="w-4 h-4" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-2" side="top">
+                <div className="flex gap-1">
+                  {emojis.map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => {
+                        onSendReaction(emoji);
+                        setShowEmojiPicker(false);
+                      }}
+                      className="text-2xl p-2 hover:bg-accent rounded-lg transition-colors"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
         </div>
 
         {/* Main Controls */}

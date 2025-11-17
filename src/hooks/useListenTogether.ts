@@ -8,6 +8,14 @@ export interface ChatMessage {
   isOwn: boolean;
 }
 
+export interface EmojiReaction {
+  id: string;
+  emoji: string;
+  userId: string;
+  color: string;
+  timestamp: number;
+}
+
 export interface ConnectedUser {
   id: string;
   nickname: string;
@@ -21,6 +29,7 @@ export interface ListenTogetherState {
   connectedUsers: ConnectedUser[];
   peer: Peer | null;
   messages: ChatMessage[];
+  reactions: EmojiReaction[];
   userNickname: string | null;
   userColor: string | null;
 }
@@ -36,6 +45,7 @@ export const useListenTogether = (
     connectedUsers: [],
     peer: null,
     messages: [],
+    reactions: [],
     userNickname: null,
     userColor: null,
   });
@@ -139,6 +149,12 @@ export const useListenTogether = (
                 timestamp: new Date(),
                 isOwn: false,
               }],
+            }));
+          } else if (data.type === 'reaction') {
+            console.log('[Host] Received reaction:', data.reaction);
+            setState(prev => ({
+              ...prev,
+              reactions: [...prev.reactions, data.reaction],
             }));
           }
         });
@@ -255,6 +271,12 @@ export const useListenTogether = (
                 messages: newMessages,
               };
             });
+          } else if (data.type === 'reaction') {
+            console.log('[Guest] Received reaction:', data.reaction);
+            setState(prev => ({
+              ...prev,
+              reactions: [...prev.reactions, data.reaction],
+            }));
           }
         });
 
@@ -366,6 +388,48 @@ export const useListenTogether = (
     }
   };
 
+  const sendReaction = (emoji: string) => {
+    console.log('[SendReaction] Attempting to send:', emoji);
+    
+    const connections = state.isHost 
+      ? connectionsRef.current 
+      : new Map([[state.roomCode || '', connectionsRef.current.get(state.roomCode || '') as DataConnection]]);
+
+    if (connections.size === 0) {
+      console.error('[SendReaction] No active connections');
+      return;
+    }
+
+    const reaction: EmojiReaction = {
+      id: `${Date.now()}-${Math.random()}`,
+      emoji,
+      userId: state.peer?.id || 'unknown',
+      color: state.userColor || '#FF6B6B',
+      timestamp: Date.now(),
+    };
+
+    const reactionMessage = {
+      type: 'reaction',
+      reaction,
+    };
+
+    connections.forEach((conn, peerId) => {
+      if (conn && conn.open) {
+        try {
+          conn.send(reactionMessage);
+          console.log('[SendReaction] Sent to peer:', peerId);
+        } catch (err) {
+          console.error('[SendReaction] Failed to send to', peerId, err);
+        }
+      }
+    });
+
+    setState(prev => ({
+      ...prev,
+      reactions: [...prev.reactions, reaction],
+    }));
+  };
+
   const disconnect = () => {
     connectionsRef.current.forEach(conn => conn.close());
     connectionsRef.current.clear();
@@ -380,6 +444,7 @@ export const useListenTogether = (
       connectedUsers: [],
       peer: null,
       messages: [],
+      reactions: [],
       userNickname: null,
       userColor: null,
     });
@@ -391,6 +456,7 @@ export const useListenTogether = (
     joinRoom,
     sendControl,
     sendMessage,
+    sendReaction,
     disconnect,
   };
 };
